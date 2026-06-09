@@ -225,13 +225,13 @@ export default {
     }
 
     if (path.startsWith('/api/services/') && request.method === 'GET') {
-      const slug = path.split('/api/services/')[1]?.replace('/', '') ?? ''
-      const row = await env.DB.prepare(
-        `SELECT * FROM service_texts WHERE slug = ? AND status = 'published' ORDER BY version DESC LIMIT 1`
-      ).bind(slug).first()
-      if (!row) return jsonResponse({ error: 'Service not found' }, 404)
-      const sections = row.sections ? JSON.parse(row.sections as string) : []
-      return jsonResponse({ ...row, sections })
+    const slug = path.split('/api/services/')[1]?.replace('/', '') ?? ''
+    const row = await env.DB.prepare(
+    `SELECT st.*, sc.title_pt AS catalog_title_pt, sc.title_ar AS catalog_title_ar FROM service_texts st LEFT JOIN service_catalog sc ON st.slug = sc.slug WHERE st.slug = ? AND st.status = 'published' ORDER BY st.version DESC LIMIT 1`
+    ).bind(slug).first()
+    if (!row) return jsonResponse({ error: 'Service not found' }, 404)
+    const sections = row.sections ? JSON.parse(row.sections as string) : []
+    return jsonResponse({ ...row, sections })
     }
 
     if (path === '/api/blog' && request.method === 'GET') {
@@ -321,14 +321,63 @@ export default {
       }
 
       if (path === '/api/admin/bulletin' && request.method === 'POST') {
-        const body = await request.json() as any
-        await env.DB.prepare(
-          `INSERT OR REPLACE INTO bulletins (title, body, category, publish_date, expires_date, status) VALUES (?, ?, ?, ?, ?, ?)`
-        ).bind(
-          body.title, body.body, body.category, body.publish_date,
-          body.expires_date ?? null, body.status ?? 'pending'
-        ).run()
-        return jsonResponse({ ok: true })
+      const body = await request.json() as any
+      await env.DB.prepare(
+      `INSERT OR REPLACE INTO bulletins (title, body, category, publish_date, expires_date, status) VALUES (?, ?, ?, ?, ?, ?)`
+      ).bind(
+      body.title, body.body, body.category, body.publish_date,
+      body.expires_date ?? null, body.status ?? 'pending'
+      ).run()
+      return jsonResponse({ ok: true })
+      }
+
+      if (path === '/api/admin/service-texts' && request.method === 'GET') {
+ const slug = url.searchParams.get('slug') ?? ''
+ if (slug) {
+ const rows = await env.DB.prepare(
+ `SELECT id, slug, title_pt, title_ar, title_ar_transliterated, category, subcategory, status, version, source_booklet_pages, updated_at, approved_at FROM service_texts WHERE slug = ? ORDER BY version DESC`
+ ).bind(slug).all()
+ return jsonResponse(rows.results)
+ }
+ const rows = await env.DB.prepare(
+ `SELECT st.id, st.slug, st.title_pt, st.status, st.version, st.updated_at, sc.title_pt AS catalog_title_pt FROM service_texts st LEFT JOIN service_catalog sc ON st.slug = sc.slug ORDER BY st.slug, st.version DESC`
+ ).all()
+ return jsonResponse(rows.results)
+ }
+
+ if (path === '/api/admin/service-texts' && request.method === 'POST') {
+      const body = await request.json() as any
+      const now = new Date().toISOString()
+      const sections = typeof body.sections === 'string' ? body.sections : JSON.stringify(body.sections ?? [])
+      const currentVersion = await env.DB.prepare(
+      `SELECT MAX(version) as max_v FROM service_texts WHERE slug = ?`
+      ).bind(body.slug).first<{ max_v: number | null }>()
+      const version = (currentVersion?.max_v ?? 0) + 1
+      await env.DB.prepare(
+      `INSERT INTO service_texts (slug, title_pt, title_ar, title_ar_transliterated, category, subcategory, sections, status, version, source_booklet_pages, updated_at, approved_at, approved_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ).bind(
+      body.slug, body.title_pt, body.title_ar ?? null, body.title_ar_transliterated ?? null,
+      body.category, body.subcategory ?? null, sections,
+      body.status ?? 'pending', version, body.source_booklet_pages ?? null,
+      now, body.status === 'published' ? now : null, body.status === 'published' ? 'admin' : null
+      ).run()
+      return jsonResponse({ ok: true, version })
+      }
+
+      if (path === '/api/admin/service-texts' && request.method === 'PUT') {
+      const body = await request.json() as any
+      const now = new Date().toISOString()
+      const sections = typeof body.sections === 'string' ? body.sections : JSON.stringify(body.sections ?? [])
+      await env.DB.prepare(
+      `UPDATE service_texts SET title_pt = ?, title_ar = ?, title_ar_transliterated = ?, category = ?, subcategory = ?, sections = ?, status = ?, source_booklet_pages = ?, updated_at = ?, approved_at = ?, approved_by = ? WHERE id = ?`
+      ).bind(
+      body.title_pt, body.title_ar ?? null, body.title_ar_transliterated ?? null,
+      body.category, body.subcategory ?? null, sections,
+      body.status ?? 'pending', body.source_booklet_pages ?? null,
+      now, body.status === 'published' ? now : null, body.status === 'published' ? 'admin' : null,
+      body.id
+      ).run()
+      return jsonResponse({ ok: true })
       }
 
       if (path === '/api/admin/scrape-now' && request.method === 'POST') {
