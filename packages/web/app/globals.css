@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&display=swap");
+
+@layer base {
+  :root {
+    --lit-bg: #1a1714;
+    --lit-parchment: #f5f0e8;
+    --lit-overlay: rgba(26, 23, 20, 0.85);
+    --lit-gold: #c4a35a;
+    --lit-gold-dark: #8b6914;
+    --lit-red: #8b1a1e;
+    --lit-red-dark: #5c1013;
+    --lit-text: #e8dcc8;
+    --lit-text-secondary: #b5a99a;
+    --lit-muted: #8a7f72;
+    --lit-rubric: #7a1515;
+    --font-display: "Noto Serif", Georgia, "Palatino Linotype", serif;
+    --font-arabic: "Noto Naskh Arabic", "Scheherazade New", serif;
+    --font-ui: system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    @apply text-lit-text;
+    font-family: var(--font-display);
+    background-color: var(--lit-bg);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  .arabic-text {
+    @apply text-right text-2xl leading-loose;
+    font-family: var(--font-arabic);
+    direction: rtl;
+  }
+
+  .rubric {
+    @apply text-lit-rubric italic text-sm;
+  }
+
+  .card-liturgical {
+    @apply bg-lit-parchment text-lit-bg rounded-lg p-6 relative overflow-hidden;
+  }
+
+  .tone-badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 bg-lit-gold text-lit-bg rounded-full text-xs font-semibold;
+  }
+
+  .fast-badge {
+    @apply inline-flex items-center gap-1 text-lit-text-secondary text-sm;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-arabic {
+    font-family: var(--font-arabic);
+  }
+  .font-ui {
+    font-family: var(--font-ui);
+  }
+}

@@ -1,0 +1,46 @@
+name = "sao-jorge-api"
+main = "src/index.ts"
+compatibility_date = "2026-05-28"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+TZ = "America/Sao_Paulo"
+
+# ── D1 Database ────────────────────────────────────────────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "sao-jorge-db"
+database_id = "839dd3d0-71ad-4cc7-b3c6-4aa606dcc2c1"
+
+# ── KV Namespaces ──────────────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "DAY_CACHE"
+id = "db0694d53c494194a1a817f9bf6924f8"
+preview_id = "29b65473140b417cb473496d45141a0d"
+
+# ── R2 Buckets ─────────────────────────────────────────────────────────────────
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "sao-jorge-media"
+
+# ── Cron Triggers ─────────────────────────────────────────────────────────────
+[triggers]
+crons = ["0 3 * * *"]
+
+# ── Secrets (set via: wrangler secret put SECRET_NAME) ───────────────────────
+# ADMIN_TOKEN — Bearer token for /api/admin/* routes
+# RESEND_KEY  — Resend API key for email notifications (optional)
+# ADMIN_EMAIL — Timon's email for review notifications
+
+# ── Dev environment ────────────────────────────────────────────────────────────
+[env.dev]
+name = "sao-jorge-api-dev"
+
+[env.dev.vars]
+ENVIRONMENT = "development"
+
+# [[env.dev.d1_databases]]
+# binding = "DB"
+# database_name = "sao-jorge-db-dev"
+# database_id = "TODO"

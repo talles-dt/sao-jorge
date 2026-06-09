@@ -1,0 +1,18 @@
+{
+  "name": "sao-jorge-v2",
+  "version": "2.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "cd packages/api && npm run dev",
+    "dev:web": "cd packages/web && npm run dev",
+    "build:web": "cd packages/web && npm run build",
+    "deploy:api": "cd packages/api && npm run deploy",
+    "deploy:web": "cd packages/web && npm run deploy",
+    "db:local": "cd packages/api && npm run db:local",
+    "db:migrate": "cd packages/api && npm run db:migrate",
+    "type-check": "tsc --noEmit"
+  }
+}

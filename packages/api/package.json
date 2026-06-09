@@ -1,0 +1,22 @@
+{
+  "name": "@sao-jorge/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staged": "wrangler deploy --env staging",
+    "db:local": "wrangler d1 execute sao-jorge-db --local --file=./migrations/001_schema.sql && wrangler d1 execute sao-jorge-db --local --file=./migrations/002_seed.sql",
+    "db:migrate": "wrangler d1 execute sao-jorge-db --file=./migrations/001_schema.sql && wrangler d1 execute sao-jorge-db --file=./migrations/002_seed.sql",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sao-jorge/shared": "file:../shared"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250321.0",
+    "typescript": "^5.4.5",
+    "wrangler": "^4.96.0"
+  }
+}
