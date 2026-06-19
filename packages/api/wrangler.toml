@@ -28,6 +28,10 @@ bucket_name = "sao-jorge-media"
 [triggers]
 crons = ["0 3 * * *"]
 
+# ── Workers AI ──────────────────────────────────────────────────────────────
+[ai]
+binding = "AI"
+
 # ── Secrets (set via: wrangler secret put SECRET_NAME) ───────────────────────
 # ADMIN_TOKEN — Bearer token for /api/admin/* routes
 # RESEND_KEY  — Resend API key for email notifications (optional)

@@ -19,10 +19,11 @@ export default async function HomePage() {
   const day = dayRes.data;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 lit-grain">
       {/* Hero + Today's Liturgy */}
       <section className="flex flex-col md:flex-row gap-6">
-        <div className="flex-1 bg-lit-parchment text-lit-bg rounded-lg p-6 relative overflow-hidden">
+        <div className="flex-1 bg-lit-parchment text-lit-bg rounded-lg p-6 relative overflow-hidden lit-card">
+          {/* Gold accent bar */}
           <div
             className={`absolute left-0 top-0 bottom-0 w-1 ${
               (day?.feastLevel ?? 0) >= 4
@@ -32,9 +33,14 @@ export default async function HomePage() {
                 : "bg-stone-600"
             }`}
           />
+
+          {/* Decorative cross */}
+          <div className="absolute top-3 right-4 text-2xl opacity-10 select-none">☩</div>
+
           <h2 className="text-sm uppercase tracking-widest text-stone-500 font-ui mb-2">
             Hoje litúrgico
           </h2>
+
           {day ? (
             <>
               <time className="text-xs text-stone-500 font-ui">
@@ -49,7 +55,13 @@ export default async function HomePage() {
                 {day.feastNamePt ?? "Féria"}
               </h1>
               {day.feastNameAr && (
-                <p className="text-right text-lg mt-1 leading-loose" style={{ fontFamily: "'Noto Naskh Arabic', serif", direction: "rtl" }}>
+                <p
+                  className="text-right text-lg mt-1 leading-loose"
+                  style={{
+                    fontFamily: "'Noto Naskh Arabic', serif",
+                    direction: "rtl",
+                  }}
+                >
                   {day.feastNameAr}
                 </p>
               )}
@@ -57,7 +69,9 @@ export default async function HomePage() {
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-700 rounded-full text-xs font-semibold text-white">
                   Tom {day.toneOfWeek}
                 </span>
-                <span className="text-sm text-stone-600">{FAST_LABELS[day.fastType]}</span>
+                <span className="text-sm text-stone-600">
+                  {FAST_LABELS[day.fastType]}
+                </span>
               </div>
               {(day?.epistleRef || day?.gospelRef) && (
                 <div className="mt-4 text-sm text-stone-600">
@@ -76,20 +90,20 @@ export default async function HomePage() {
         {/* Quick links */}
         <div className="w-full md:w-64 space-y-3">
           <Link
-            href="/servicos/divina-liturgia-sao-joao-crisostomo"
-            className="block w-full bg-lit-red hover:bg-lit-red-dark text-white text-center py-3 rounded-lg font-display transition font-semibold"
+            href="/servicos/divina-liturgia-crisostomo"
+            className="block w-full bg-lit-red hover:bg-lit-red-dark text-white text-center py-3 rounded-lg font-display transition-all duration-300 font-semibold lit-card"
           >
             ☩ Divina Liturgia
           </Link>
           <Link
             href="/servicos"
-            className="block w-full bg-stone-700 hover:bg-stone-600 text-white text-center py-3 rounded-lg font-ui text-sm transition"
+            className="block w-full bg-stone-700 hover:bg-stone-600 text-white text-center py-3 rounded-lg font-ui text-sm transition-all duration-300 lit-card"
           >
             Todos os serviços
           </Link>
           <Link
             href="/catequeses"
-            className="block w-full bg-stone-800 hover:bg-stone-700 text-white text-center py-3 rounded-lg font-ui text-sm transition"
+            className="block w-full bg-stone-800 hover:bg-stone-700 text-white text-center py-3 rounded-lg font-ui text-sm transition-all duration-300 lit-card"
           >
             Catequeses
           </Link>
@@ -101,8 +115,13 @@ export default async function HomePage() {
         {/* Bulletins */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-display text-amber-500">Avisos da Paróquia</h3>
-            <Link href="/boletim" className="text-sm text-stone-400 hover:text-white transition">
+            <h3 className="text-lg font-display text-amber-500">
+              Avisos da Paróquia
+            </h3>
+            <Link
+              href="/boletim"
+              className="text-sm text-stone-400 hover:text-white transition"
+            >
               Ver todos →
             </Link>
           </div>
@@ -111,17 +130,21 @@ export default async function HomePage() {
               bulletinsRes.data.map((b: any) => (
                 <div
                   key={b.id}
-                  className="bg-stone-800/50 rounded-lg p-4 hover:bg-stone-800 transition"
+                  className="bg-stone-800/50 rounded-lg p-4 hover:bg-stone-800 transition-all duration-300 lit-card"
                 >
                   <span className="text-xs text-stone-400 font-ui uppercase tracking-wide">
                     {b.category}
                   </span>
                   <h4 className="font-display mt-1 text-white">{b.title}</h4>
-                  <p className="text-sm text-stone-300 mt-1 line-clamp-2">{b.body}</p>
+                  <p className="text-sm text-stone-300 mt-1 line-clamp-2">
+                    {b.body}
+                  </p>
                 </div>
               ))
             ) : (
-              <p className="text-stone-400 italic text-sm">Nenhum aviso no momento.</p>
+              <p className="text-stone-400 italic text-sm">
+                Nenhum aviso no momento.
+              </p>
             )}
           </div>
         </section>
@@ -130,7 +153,10 @@ export default async function HomePage() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-display text-amber-500">Blog</h3>
-            <Link href="/blog" className="text-sm text-stone-400 hover:text-white transition">
+            <Link
+              href="/blog"
+              className="text-sm text-stone-400 hover:text-white transition"
+            >
               Ver artigos →
             </Link>
           </div>
@@ -140,17 +166,21 @@ export default async function HomePage() {
                 <Link
                   href={`/blog/${p.slug}`}
                   key={p.slug}
-                  className="block bg-stone-800/50 rounded-lg p-4 hover:bg-stone-800 transition"
+                  className="block bg-stone-800/50 rounded-lg p-4 hover:bg-stone-800 transition-all duration-300 lit-card"
                 >
                   <span className="text-xs text-stone-400 font-ui uppercase tracking-wide">
                     {p.category}
                   </span>
                   <h4 className="font-display mt-1 text-white">{p.title}</h4>
-                  <p className="text-sm text-stone-300 mt-1 line-clamp-2">{p.excerpt}</p>
+                  <p className="text-sm text-stone-300 mt-1 line-clamp-2">
+                    {p.excerpt}
+                  </p>
                 </Link>
               ))
             ) : (
-              <p className="text-stone-400 italic text-sm">Nenhum artigo publicado ainda.</p>
+              <p className="text-stone-400 italic text-sm">
+                Nenhum artigo publicado ainda.
+              </p>
             )}
           </div>
         </section>
@@ -160,12 +190,15 @@ export default async function HomePage() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-display text-amber-500">Podcast</h3>
-          <Link href="/podcast" className="text-sm text-stone-400 hover:text-white transition">
+          <Link
+            href="/podcast"
+            className="text-sm text-stone-400 hover:text-white transition"
+          >
             Ver todos →
           </Link>
         </div>
         <div className="bg-stone-800/30 rounded-lg p-6 text-center text-stone-400">
-          <p>Em breve: episódios do podcast “No Caminho da Vida”</p>
+          <p>Em breve: episódios do podcast &ldquo;No Caminho da Vida&rdquo;</p>
         </div>
       </section>
     </div>
