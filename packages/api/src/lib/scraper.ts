@@ -147,11 +147,11 @@ export async function runScraper(env: Env): Promise<void> {
   });
   const dates: string[] = [];
   for (let i = 0; i < 8; i++) {
-    const d = new Date(today);
-    d.setDate(d.getDate() + i);
-    dates.push(
-      d.toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" }),
-    );
+    // Parse today's date in Brasília timezone to avoid UTC midnight edge case
+    const [y, m, d] = today.split("-").map(Number);
+    const date = new Date(y, m - 1, d + i); // local date construction, no UTC ambiguity
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    dates.push(dateStr);
   }
 
   // Fetch all orthocal data in parallel

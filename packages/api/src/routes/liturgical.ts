@@ -48,7 +48,15 @@ async function handleDayByDate(date: string, env: Env): Promise<Response> {
 
   const data = {
     ...row,
-    enrichment: row.enrichment ? JSON.parse(row.enrichment) : null,
+    enrichment: row.enrichment
+      ? (() => {
+          try {
+            return JSON.parse(row.enrichment);
+          } catch {
+            return null;
+          }
+        })()
+      : null,
   };
   await env.DAY_CACHE.put(`day:${date}`, JSON.stringify(data), {
     expirationTtl: 86400,

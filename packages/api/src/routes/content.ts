@@ -19,7 +19,7 @@ export async function handleContentRoutes(
 
   // Single service
   if (path.startsWith("/api/services/") && request.method === "GET") {
-    const slug = path.split("/api/services/")[1]?.replace("/", "") ?? "";
+    const slug = path.split("/api/services/")[1]?.replace(/\//g, "") ?? "";
     const row = await env.DB.prepare(
       `SELECT st.*, sc.title_pt AS catalog_title_pt, sc.title_ar AS catalog_title_ar FROM service_texts st LEFT JOIN service_catalog sc ON st.slug = sc.slug WHERE st.slug = ? AND st.status = 'published' ORDER BY st.version DESC LIMIT 1`,
     )

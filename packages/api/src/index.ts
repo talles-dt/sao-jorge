@@ -54,7 +54,14 @@ export default {
     console.log(`[cron] ☩ São Jorge scraper — ${todayBrasilia()}`);
     try {
       await runScraper(env);
-      await env.DAY_CACHE.delete("day:" + todayBrasilia());
+      // Invalidate ALL date caches (today + next 7 days)
+      const today = todayBrasilia();
+      const [y, m, d] = today.split("-").map(Number);
+      for (let i = 0; i < 8; i++) {
+        const date = new Date(y, m - 1, d + i);
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        await env.DAY_CACHE.delete("day:" + dateStr);
+      }
     } catch (e: unknown) {
       console.error("[cron] Scraper failed:", (e as Error).message);
     }

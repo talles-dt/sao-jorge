@@ -60,5 +60,11 @@ export function checkAdminAuth(request: Request, env: Env): { ok: boolean } {
   const auth = request.headers.get("Authorization");
   if (!auth || !auth.startsWith("Bearer ")) return { ok: false };
   const token = auth.slice(7);
-  return { ok: token === env.ADMIN_TOKEN };
+  // Timing-safe comparison to prevent timing attacks
+  if (token.length !== env.ADMIN_TOKEN.length) return { ok: false };
+  let result = 0;
+  for (let i = 0; i < token.length; i++) {
+    result |= token.charCodeAt(i) ^ env.ADMIN_TOKEN.charCodeAt(i);
+  }
+  return { ok: result === 0 };
 }
