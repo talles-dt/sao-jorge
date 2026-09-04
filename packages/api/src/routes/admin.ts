@@ -1,8 +1,9 @@
 // ☩ São Jorge V2 — Admin routes
 
 import type { Env } from "../lib/types";
-import { jsonResponse, checkAdminAuth, todayBrasilia } from "../lib/types";
+import { jsonResponse, checkAdminAuth } from "../lib/types";
 import { runScraper } from "../lib/scraper";
+import { getZernioClient, listZernioAccounts, createZernioPost, listZernioPosts, getZernioAnalytics, listZernioInboxConversations, sendZernioMessage } from "@sao-jorge/shared/zernio";
 
 export async function handleAdminRoutes(
   path: string,
@@ -158,6 +159,102 @@ export async function handleAdminRoutes(
   if (path === "/api/admin/scrape-now" && request.method === "POST") {
     await runScraper(env);
     return jsonResponse({ ok: true, triggered: "scraper" });
+  }
+
+  // ─── Zernio Admin Routes ────────────────────────────────────────────────
+
+  // Zernio: list connected accounts
+  if (path === "/api/admin/zernio/accounts" && request.method === "GET") {
+    try {
+      const accounts = await listZernioAccounts();
+      return jsonResponse(accounts);
+    } catch (e: unknown) {
+      return jsonResponse({ error: (e as Error).message }, 500);
+    }
+  }
+
+  // Zernio: list posts
+  if (path === "/api/admin/zernio/posts" && request.method === "GET") {
+    try {
+      const url = new URL(request.url);
+      const params = {
+        status: url.searchParams.get("status") || undefined,
+        platform: url.searchParams.get("platform") || undefined,
+        accountId: url.searchParams.get("accountId") || undefined,
+        limit: url.searchParams.get("limit") ? parseInt(url.searchParams.get("limit")!) : undefined,
+        offset: url.searchParams.get("offset") ? parseInt(url.searchParams.get("offset")!) : undefined,
+      };
+      const posts = await listZernioPosts(params);
+      return jsonResponse(posts);
+    } catch (e: unknown) {
+      return jsonResponse({ error: (e as Error).message }, 500);
+    }
+  }
+
+  // Zernio: create post
+  if (path === "/api/admin/zernio/posts" && request.method === "POST") {
+    try {
+      const body = (await request.json()) as {
+        content: string;
+        platforms: { platform: string; accountId: string }[];
+        scheduledFor?: string;
+        publishNow?: boolean;
+      };
+      const result = await createZernioPost(body);
+      return jsonResponse(result);
+    } catch (e: unknown) {
+      return jsonResponse({ error: (e as Error).message }, 500);
+    }
+  }
+
+  // Zernio: analytics
+  if (path === "/api/admin/zernio/analytics" && request.method === "GET") {
+    try {
+      const url = new URL(request.url);
+      const params = {
+        platform: url.searchParams.get("platform") || undefined,
+        accountId: url.searchParams.get("accountId") || undefined,
+        from: url.searchParams.get("from") || undefined,
+        to: url.searchParams.get("to") || undefined,
+      };
+      const analytics = await getZernioAnalytics(params);
+      return jsonResponse(analytics);
+    } catch (e: unknown) {
+      return jsonResponse({ error: (e as Error).message }, 500);
+    }
+  }
+
+  // Zernio: inbox conversations
+  if (path === "/api/admin/zernio/inbox" && request.method === "GET") {
+    try {
+      const url = new URL(request.url);
+      const params = {
+        platform: url.searchParams.get("platform") || undefined,
+        accountId: url.searchParams.get("accountId") || undefined,
+        status: url.searchParams.get("status") || undefined,
+        limit: url.searchParams.get("limit") ? parseInt(url.searchParams.get("limit")!) : undefined,
+        offset: url.searchParams.get("offset") ? parseInt(url.searchParams.get("offset")!) : undefined,
+      };
+      const conversations = await listZernioInboxConversations(params);
+      return jsonResponse(conversations);
+    } catch (e: unknown) {
+      return jsonResponse({ error: (e as Error).message }, 500);
+    }
+  }
+
+  // Zernio: send message
+  if (path === "/api/admin/zernio/inbox/send" && request.method === "POST") {
+    try {
+      const body = (await request.json()) as {
+        conversationId: string;
+        content: string;
+        mediaIds?: string[];
+      };
+      const result = await sendZernioMessage(body.conversationId, body.content, body.mediaIds);
+      return jsonResponse(result);
+    } catch (e: unknown) {
+      return jsonResponse({ error: (e as Error).message }, 500);
+    }
   }
 
   return jsonResponse({ error: "Not found" }, 404);

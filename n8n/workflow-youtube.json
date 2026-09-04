@@ -1,0 +1,210 @@
+{
+  "name": "☩ São Jorge — YouTube Metadata",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "youtube-metadata",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook — Receive Metadata",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "sao-jorge-youtube"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.headers['x-webhook-secret'] }}",
+              "rightValue": "={{ $env.N8N_WEBHOOK_SECRET }}",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "auth-check",
+      "name": "Verify Secret",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"error\": \"unauthorized\" }",
+        "options": { "responseCode": 401 }
+      },
+      "id": "reject",
+      "name": "Reject",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [460, 480]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.body.videoId }}",
+              "operator": { "type": "string", "operation": "isNotEmpty" }
+            }
+          ]
+        }
+      },
+      "id": "has-video-id",
+      "name": "Has Video ID?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "video",
+        "operation": "update",
+        "videoId": "={{ $json.body.videoId }}",
+        "title": "={{ $json.body.title }}",
+        "description": "={{ $json.body.description }}",
+        "categoryId": "29",
+        "options": {
+          "privacyStatus": "public",
+          "tags": "={{ $json.body.tags }}"
+        }
+      },
+      "id": "update-video",
+      "name": "Update Video Metadata",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [900, 200],
+      "credentials": {
+        "youTubeOAuth2Api": { "id": "youtube-creds", "name": "YouTube OAuth2" }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $json.body.title }}",
+        "description": "={{ $json.body.description }}",
+        "categoryId": "29",
+        "options": {
+          "privacyStatus": "={{ $json.body.privacy || 'public' }}",
+          "tags": "={{ $json.body.tags }}",
+          "embeddable": true
+        }
+      },
+      "id": "upload-video",
+      "name": "Upload New Video",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [900, 420],
+      "credentials": {
+        "youTubeOAuth2Api": { "id": "youtube-creds", "name": "YouTube OAuth2" }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.WORKER_URL }}/api/admin/social/published",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{ $env.WORKER_ADMIN_TOKEN }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "social_post_id", "value": "={{ $('Webhook — Receive Metadata').item.json.body.social_post_id }}" },
+            { "name": "platform", "value": "youtube" },
+            { "name": "platform_post_id", "value": "={{ $json.id }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-workers",
+      "name": "Notify Workers — Published",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, video_id: $json.id } }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "respond-success",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.WORKER_URL }}/api/admin/social/published",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{ $env.WORKER_ADMIN_TOKEN }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "social_post_id", "value": "={{ $('Webhook — Receive Metadata').item.json.body.social_post_id }}" },
+            { "name": "platform", "value": "youtube" },
+            { "name": "platform_post_id", "value": "={{ $json.id }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-workers-upload",
+      "name": "Notify Workers — Uploaded",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 420]
+    }
+  ],
+  "connections": {
+    "Webhook — Receive Metadata": {
+      "main": [[{ "node": "Verify Secret", "type": "main", "index": 0 }]]
+    },
+    "Verify Secret": {
+      "main": [
+        [{ "node": "Has Video ID?", "type": "main", "index": 0 }],
+        [{ "node": "Reject", "type": "main", "index": 0 }]
+      ]
+    },
+    "Has Video ID?": {
+      "main": [
+        [{ "node": "Update Video Metadata", "type": "main", "index": 0 }],
+        [{ "node": "Upload New Video", "type": "main", "index": 0 }]
+      ]
+    },
+    "Update Video Metadata": {
+      "main": [[{ "node": "Notify Workers — Published", "type": "main", "index": 0 }]]
+    },
+    "Upload New Video": {
+      "main": [[{ "node": "Notify Workers — Uploaded", "type": "main", "index": 0 }]]
+    },
+    "Notify Workers — Published": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    },
+    "Notify Workers — Uploaded": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "tags": ["sao-jorge", "youtube", "social"]
+}

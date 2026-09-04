@@ -1,0 +1,14 @@
+FROM n8nio/n8n:latest
+
+# Railway injects PORT env var — n8n uses N8N_PORT
+ENV N8N_PORT=$PORT
+ENV N8N_HOST=0.0.0.0
+ENV N8N_PROTOCOL=https
+ENV GENERIC_TIMEZONE=America/Sao_Paulo
+ENV TZ=America/Sao_Paulo
+ENV N8N_DIAGNOSTICS_ENABLED=false
+ENV N8N_VERSION_NOTIFICATIONS_ENABLED=false
+
+EXPOSE $PORT
+
+CMD ["n8n", "start"]

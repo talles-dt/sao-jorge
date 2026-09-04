@@ -1,0 +1,64 @@
+name: Deploy Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'nextjs/**'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  deploy:
+    name: Deploy to Cloudflare Pages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd nextjs
+          npm ci
+
+      - name: Build Next.js app
+        run: |
+          cd nextjs
+          npm run pages:build
+
+      - name: List deployment files
+        run: |
+          cd nextjs
+          ls -la .open-next/
+          ls -la .open-next/cloudflare/
+          ls -la .open-next/assets/ || true
+
+      - name: Install wrangler
+        run: |
+          cd nextjs
+          npm install -g wrangler@latest
+
+      - name: Create _redirects file
+        run: |
+          cd nextjs
+          echo "/* /index.html 200" > .open-next/_redirects
+
+      - name: Deploy to Cloudflare Pages
+        run: |
+          cd nextjs
+          npx wrangler pages deploy .open-next --project-name=sao-jorge --branch=main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

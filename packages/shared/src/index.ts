@@ -131,3 +131,6 @@ export interface PodcastEpisode {
   spotifyUrl: string | null
   buzzsproutUrl: string | null
 }
+
+/// ☩ Zernio Social Media — re-export from dedicated module
+export * from './zernio';

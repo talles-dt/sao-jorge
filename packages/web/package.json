@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@sao-jorge/shared": "file:../shared",
+    "@zernio/node": "^0.2.419",
     "next": "^15.3.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

@@ -12,7 +12,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@sao-jorge/shared": "file:../shared"
+    "@sao-jorge/shared": "file:../shared",
+    "@zernio/node": "^0.2.419"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250321.0",

@@ -1,0 +1,87 @@
+{
+  "name": "☩ São Jorge — Instagram Token Refresh",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "days", "daysInterval": 50 }] }
+      },
+      "id": "schedule",
+      "name": "Every 50 Days",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v21.0/oauth/access_token",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "grant_type", "value": "fb_exchange_token" },
+            { "name": "client_id", "value": "={{ $env.META_APP_ID }}" },
+            { "name": "client_secret", "value": "={{ $env.META_APP_SECRET }}" },
+            { "name": "fb_exchange_token", "value": "={{ $env.IG_ACCESS_TOKEN }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "refresh-token",
+      "name": "Refresh Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.WORKER_URL }}/api/admin/instagram/token",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{ $env.WORKER_ADMIN_TOKEN }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "access_token", "value": "={{ $json.access_token }}" },
+            { "name": "expires_in", "value": "={{ $json.expires_in }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "store-new-token",
+      "name": "Store New Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "message": "=☩ Instagram token refreshed. Expires in: {{ $('Refresh Token').item.json.expires_in }}s",
+        "options": {}
+      },
+      "id": "log-success",
+      "name": "Log Success",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Every 50 Days": {
+      "main": [[{ "node": "Refresh Token", "type": "main", "index": 0 }]]
+    },
+    "Refresh Token": {
+      "main": [[{ "node": "Store New Token", "type": "main", "index": 0 }]]
+    },
+    "Store New Token": {
+      "main": [[{ "node": "Log Success", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false
+  },
+  "tags": ["sao-jorge", "instagram", "maintenance"]
+}
