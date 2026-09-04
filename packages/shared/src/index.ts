@@ -2,25 +2,25 @@
 
 export interface LiturgicalDay {
   date: string
-  toneOfWeek: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
-  fastType: 'none' | 'strict' | 'fish' | 'wine-oil' | 'xerophagy'
-  feastLevel: 0 | 1 | 2 | 3 | 4 | 5 | 6
-  feastNamePt: string | null
-  feastNameAr: string | null
-  feastNameEn: string | null
-  saintSlug: string | null
-  epistleRef: string | null
-  gospelRef: string | null
-  epistleTextPt: string | null
-  gospelTextPt: string | null
-  troparionSlug: string | null
-  kontakionSlug: string | null
+  tone_of_week: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+  fast_type: 'none' | 'strict' | 'fish' | 'wine-oil' | 'xerophagy'
+  feast_level: 0 | 1 | 2 | 3 | 4 | 5 | 6
+  feast_name_pt: string | null
+  feast_name_ar: string | null
+  feast_name_en: string | null
+  saint_slug: string | null
+  epistle_ref: string | null
+  gospel_ref: string | null
+  epistle_text_pt: string | null
+  gospel_text_pt: string | null
+  troparion_slug: string | null
+  kontakion_slug: string | null
   enrichment: DayEnrichment | null
   source: 'antiochian' | 'orthocal' | 'dcs' | 'manual-override'
   status: 'pending' | 'approved' | 'published'
-  scrapedAt: string
-  approvedAt: string | null
-  approvedBy: string | null
+  scraped_at: string
+  approved_at: string | null
+  approved_by: string | null
 }
 
 export interface DayEnrichment {

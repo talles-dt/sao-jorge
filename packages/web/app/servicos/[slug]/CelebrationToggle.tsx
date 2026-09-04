@@ -12,14 +12,64 @@ export default function CelebrationModeToggle({
   isDark,
 }: CelebrationModeProps) {
   const [active, setActive] = useState(false);
+  const [wakeLockSupported, setWakeLockSupported] = useState(false);
+  const [wakeLockActive, setWakeLockActive] = useState(false);
 
   useEffect(() => {
     onToggle(active);
   }, [active, onToggle]);
 
+  // Keep screen awake during celebration mode
+  useEffect(() => {
+    if (!active) {
+      setWakeLockActive(false);
+      return;
+    }
+
+    if (!("wakeLock" in navigator)) {
+      setWakeLockSupported(false);
+      return;
+    }
+
+    setWakeLockSupported(true);
+
+    let wakeLock: WakeLockSentinel | null = null;
+
+    const requestWakeLock = async () => {
+      try {
+        wakeLock = await (navigator as any).wakeLock.request("screen");
+        setWakeLockActive(true);
+      } catch {
+        setWakeLockActive(false);
+      }
+    };
+
+    requestWakeLock();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && active) {
+        requestWakeLock();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      if (wakeLock) {
+        wakeLock.release().catch(() => {});
+      }
+      setWakeLockActive(false);
+    };
+  }, [active]);
+
+  const handleToggle = useCallback(() => {
+    setActive((prev) => !prev);
+  }, []);
+
   return (
     <button
-      onClick={() => setActive(!active)}
+      onClick={handleToggle}
       className={`
         inline-flex items-center gap-2 px-4 py-2 rounded-lg font-ui text-sm
         transition-all duration-200 border
@@ -41,6 +91,12 @@ export default function CelebrationModeToggle({
         ☩
       </span>
       <span>{active ? "Celebração" : "Modo Celebração"}</span>
+      {active && wakeLockSupported && (
+        <span
+          className="ml-1 inline-flex h-2 w-2 rounded-full bg-green-400"
+          title="Tela ativa"
+        />
+      )}
     </button>
   );
 }

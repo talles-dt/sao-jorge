@@ -14,9 +14,9 @@ export default {
  "lit-gold-dark": "#8b6914",
  "lit-red": "#8b1a1e",
  "lit-red-dark": "#5c1013",
- "lit-text": "#e8dcc8",
- "lit-text-secondary": "#b5a99a",
- "lit-muted": "#8a7f72",
+ "lit-text": "#d6c8b4",
+ "lit-text-secondary": "#a89a86",
+ "lit-muted": "#6e6258",
  "lit-rubric": "#7a1515",
  },
  fontFamily: {

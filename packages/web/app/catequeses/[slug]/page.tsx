@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { fetchCatechesisUnit } from "@/lib/api";
+import InteractiveGuide from "../GuiaCatecumenal";
 
 const FALLBACK_PARAMS = [{ slug: "_placeholder" }];
 
@@ -61,6 +62,11 @@ export default async function CatechesisUnitPage({
         </p>
       </div>
     );
+  }
+
+  // Render interactive guide for catequese-adultos
+  if (slug === "catequese-adultos") {
+    return <InteractiveGuide />;
   }
 
   const response = await fetchCatechesisUnit(slug);

@@ -20,15 +20,15 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-8 lit-grain">
-      {/* Hero + Today's Liturgy */}
+      {/* Hero + Today&apos;s Liturgy */}
       <section className="flex flex-col md:flex-row gap-6">
         <div className="flex-1 bg-lit-parchment text-lit-bg rounded-lg p-6 relative overflow-hidden lit-card">
           {/* Gold accent bar */}
           <div
             className={`absolute left-0 top-0 bottom-0 w-1 ${
-              (day?.feastLevel ?? 0) >= 4
+              (day?.feast_level ?? 0) >= 4
                 ? "bg-amber-400"
-                : (day?.feastLevel ?? 0) >= 2
+                : (day?.feast_level ?? 0) >= 2
                 ? "bg-amber-700"
                 : "bg-stone-600"
             }`}
@@ -52,9 +52,14 @@ export default async function HomePage() {
                 })}
               </time>
               <h1 className="text-2xl md:text-3xl font-display mt-2 leading-tight">
-                {day.feastNamePt ?? "Féria"}
+                {day.feast_name_pt ?? "Féria"}
               </h1>
-              {day.feastNameAr && (
+              {day.feast_name_en && (
+                <p className="text-sm text-stone-500 mt-1 italic">
+                  {day.feast_name_en}
+                </p>
+              )}
+              {day.feast_name_ar && (
                 <p
                   className="text-right text-lg mt-1 leading-loose"
                   style={{
@@ -62,22 +67,32 @@ export default async function HomePage() {
                     direction: "rtl",
                   }}
                 >
-                  {day.feastNameAr}
+                  {day.feast_name_ar}
                 </p>
               )}
               <div className="flex flex-wrap gap-3 mt-4">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-700 rounded-full text-xs font-semibold text-white">
-                  Tom {day.toneOfWeek}
+                  Tom {day.tone_of_week}
                 </span>
                 <span className="text-sm text-stone-600">
-                  {FAST_LABELS[day.fastType]}
+                  {FAST_LABELS[day.fast_type] ?? "—"}
                 </span>
+                {typeof day.feast_level !== "undefined" && (
+                  <span className="text-xs text-stone-500">
+                    Nível {day.feast_level}
+                  </span>
+                )}
               </div>
-              {(day?.epistleRef || day?.gospelRef) && (
-                <div className="mt-4 text-sm text-stone-600">
-                  {day.epistleRef && <p>Epístola: {day.epistleRef}</p>}
-                  {day.gospelRef && <p>Evangelho: {day.gospelRef}</p>}
+              {(day.epistle_ref || day.gospel_ref) && (
+                <div className="mt-4 text-sm text-stone-600 space-y-1">
+                  {day.epistle_ref && <p>Epístola: {day.epistle_ref}</p>}
+                  {day.gospel_ref && <p>Evangelho: {day.gospel_ref}</p>}
                 </div>
+              )}
+              {day.saint_slug && (
+                <p className="mt-2 text-xs text-stone-500">
+                  Santo: {day.saint_slug}
+                </p>
               )}
             </>
           ) : (

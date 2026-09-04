@@ -15,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className="min-h-screen bg-[#1a1714] text-[#e8dcc8]">
+      <body className="min-h-screen bg-[#1a1714] text-lit-text">
         <nav className="sticky top-0 z-50 bg-[#8b1a1e] text-[#f0e6d2] shadow-lg">
           <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
             <Link

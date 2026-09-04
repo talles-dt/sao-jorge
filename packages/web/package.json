@@ -13,7 +13,9 @@
   "dependencies": {
     "@sao-jorge/shared": "file:../shared",
     "@zernio/node": "^0.2.419",
+    "framer-motion": "^13.2.0",
     "next": "^15.3.9",
+    "nucleo-sharp": "^1.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
