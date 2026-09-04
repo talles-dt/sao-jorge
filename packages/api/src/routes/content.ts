@@ -85,7 +85,7 @@ export async function handleContentRoutes(
       .first();
     if (!unit) return jsonResponse({ error: "Unit not found" }, 404);
     const lessons = await env.DB.prepare(
-      `SELECT slug, title, order_index, status, body FROM catechesis_lessons WHERE unit_slug = ? AND status = 'published' ORDER BY order_index`,
+      `SELECT slug, title, order_index, status, body, group_label FROM catechesis_lessons WHERE unit_slug = ? AND status = 'published' ORDER BY order_index`,
     )
       .bind(slug)
       .all();
@@ -98,6 +98,62 @@ export async function handleContentRoutes(
       `SELECT guid, title, description, published_at, duration_sec, spotify_url, buzzsprout_url FROM podcast_episodes ORDER BY published_at DESC LIMIT 10`,
     ).all();
     return jsonResponse(rows.results);
+  }
+
+  // Catechesis signup (public registration form)
+  if (path === "/api/catechesis-signup" && request.method === "POST") {
+    let body: Record<string, unknown>;
+    try {
+      body = (await request.json()) as Record<string, unknown>;
+    } catch {
+      return jsonResponse({ error: "JSON inválido" }, 400);
+    }
+
+    const unitSlug = String(body.unit_slug ?? "").trim();
+    const fullName = String(body.full_name ?? "").trim();
+    const email = String(body.email ?? "").trim();
+    const agreedToTerms = body.agreed_to_terms === true;
+
+    if (!unitSlug || !fullName || !email) {
+      return jsonResponse(
+        { error: "Nome completo, e-mail e unidade são obrigatórios." },
+        400,
+      );
+    }
+    if (!agreedToTerms) {
+      return jsonResponse(
+        { error: "É necessário concordar em participar dos encontros e observar os jejuns." },
+        400,
+      );
+    }
+    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+      return jsonResponse({ error: "E-mail inválido." }, 400);
+    }
+
+    const unit = await env.DB.prepare(
+      `SELECT slug FROM catechesis_units WHERE slug = ?`,
+    )
+      .bind(unitSlug)
+      .first();
+    if (!unit) return jsonResponse({ error: "Unidade não encontrada." }, 404);
+
+    await env.DB.prepare(
+      `INSERT INTO catechesis_signups (unit_slug, full_name, email, phone, birth_date, previous_religion, motivation, agreed_to_terms)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+      .bind(
+        unitSlug,
+        fullName,
+        email,
+        body.phone ? String(body.phone) : null,
+        body.birth_date ? String(body.birth_date) : null,
+        body.previous_religion ? String(body.previous_religion) : null,
+        body.motivation ? String(body.motivation) : null,
+        1,
+      )
+      .run();
+
+    return jsonResponse({ ok: true });
   }
 
   return null;

@@ -83,6 +83,23 @@ export function fetchCatechesisLessonsByUnitSlug(unitSlug: string) {
 /* Alias for clarity */
 export const fetchCatechesisUnits = fetchCatechesis;
 
+/* ── Catechesis signup ──────────────────────────────────── */
+export function submitCatechesisSignup(payload: {
+  unit_slug: string;
+  full_name: string;
+  email: string;
+  phone?: string;
+  birth_date?: string;
+  previous_religion?: string;
+  motivation?: string;
+  agreed_to_terms: boolean;
+}) {
+  return fetchApi<{ ok: true }>("/api/catechesis-signup", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
 /* ── Podcast ──────────────────────────────────────────── */
 export function fetchPodcast() {
   return fetchApi<Array<Record<string, unknown>>>(`/api/podcast`);

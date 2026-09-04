@@ -1,16 +1,17 @@
 import Link from "next/link";
-import { fetchCatechesisUnit } from "@/lib/api";
-import InteractiveGuide from "../GuiaCatecumenal";
+import { fetchCatechesisUnits, fetchCatechesisUnit } from "@/lib/api";
 
 const FALLBACK_PARAMS = [{ slug: "_placeholder" }];
+const DEDICATED_ROUTES = new Set(["catequese-adultos"]);
 
 export async function generateStaticParams() {
   try {
-    const response = await fetchCatechesisUnit("catequese-adultos");
-    if (response.error || !response.data) {
-      return FALLBACK_PARAMS;
-    }
-    return [{ slug: "catequese-adultos" }];
+    const response = await fetchCatechesisUnits();
+    const units = response.error ? [] : (response.data ?? []);
+    const slugs = units
+      .map((u) => String((u as Record<string, unknown>).slug ?? ""))
+      .filter((slug) => slug && !DEDICATED_ROUTES.has(slug));
+    return slugs.length > 0 ? slugs.map((slug) => ({ slug })) : FALLBACK_PARAMS;
   } catch {
     return FALLBACK_PARAMS;
   }
@@ -64,11 +65,6 @@ export default async function CatechesisUnitPage({
     );
   }
 
-  // Render interactive guide for catequese-adultos
-  if (slug === "catequese-adultos") {
-    return <InteractiveGuide />;
-  }
-
   const response = await fetchCatechesisUnit(slug);
   if (response.error || !response.data) {
     return (
@@ -91,9 +87,7 @@ export default async function CatechesisUnitPage({
           ← Voltar às catequeses
         </Link>
         <h1 className="text-3xl font-display text-lit-gold">{title}</h1>
-        {description ? (
-          <p className="mt-2 text-lit-text-secondary">{description}</p>
-        ) : null}
+        {description ? <p className="mt-2 text-lit-text-secondary">{description}</p> : null}
       </header>
 
       {body ? (
