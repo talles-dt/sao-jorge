@@ -70,7 +70,7 @@ export async function handleContentRoutes(
   // Catechesis units
   if (path === "/api/catechesis" && request.method === "GET") {
     const rows = await env.DB.prepare(
-      `SELECT slug, title, description, order_index FROM catechesis_units ORDER BY order_index ASC`,
+      `SELECT slug, title, description, order_index, body FROM catechesis_units ORDER BY order_index ASC`,
     ).all();
     return jsonResponse(rows.results);
   }
@@ -85,7 +85,7 @@ export async function handleContentRoutes(
       .first();
     if (!unit) return jsonResponse({ error: "Unit not found" }, 404);
     const lessons = await env.DB.prepare(
-      `SELECT slug, title, order_index, status FROM catechesis_lessons WHERE unit_slug = ? AND status = 'published' ORDER BY order_index`,
+      `SELECT slug, title, order_index, status, body FROM catechesis_lessons WHERE unit_slug = ? AND status = 'published' ORDER BY order_index`,
     )
       .bind(slug)
       .all();

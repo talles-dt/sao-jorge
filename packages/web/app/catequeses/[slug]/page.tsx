@@ -1,138 +1,119 @@
 import Link from "next/link";
-import { fetchCatechesis, fetchCatechesisLessonsByUnitSlug } from "@/lib/api";
+import { fetchCatechesisUnit } from "@/lib/api";
 
-/* Next.js 15.5 with output: 'export' treats generateStaticParams returning []
-   as "missing generateStaticParams". Never return [] — use a placeholder instead. */
 const FALLBACK_PARAMS = [{ slug: "_placeholder" }];
 
 export async function generateStaticParams() {
- try {
-  const response = await fetchCatechesis();
-  if (response.error || !response.data || response.data.length === 0) {
-   return FALLBACK_PARAMS;
+  try {
+    const response = await fetchCatechesisUnit("catequese-adultos");
+    if (response.error || !response.data) {
+      return FALLBACK_PARAMS;
+    }
+    return [{ slug: "catequese-adultos" }];
+  } catch {
+    return FALLBACK_PARAMS;
   }
-  return response.data.map((unit: Record<string, unknown>) => ({
-   slug: String(unit.slug),
-  }));
- } catch {
-  return FALLBACK_PARAMS;
- }
 }
 
-interface CatechesisSection {
- type: string;
- textPt?: string;
- textAr?: string;
- textArTransliterated?: string;
- verseNumber?: string;
- speakerAr?: string;
- id?: string;
+function renderBody(body: string) {
+  const lines = body.split("\n").filter((line) => line.trim() !== "");
+  return (
+    <div className="space-y-3 text-lit-text leading-relaxed">
+      {lines.map((line, idx) => {
+        const trimmed = line.trim();
+        if (!trimmed) return null;
+        if (trimmed.startsWith("- ")) {
+          return (
+            <li key={idx} className="list-disc ml-6">
+              {trimmed.slice(2)}
+            </li>
+          );
+        }
+        if (/^\d{2}\/\d{2}\/\d{4}/.test(trimmed) || /^\d{1,2}º/.test(trimmed)) {
+          return (
+            <p key={idx} className="text-sm text-lit-gold">
+              {trimmed}
+            </p>
+          );
+        }
+        return (
+          <p key={idx} className={trimmed.endsWith(":") ? "font-display text-lg text-white mt-4" : ""}>
+            {trimmed}
+          </p>
+        );
+      })}
+    </div>
+  );
 }
 
 export default async function CatechesisUnitPage({
- params,
+  params,
 }: {
- params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string }>;
 }) {
- const { slug } = await params;
+  const { slug } = await params;
 
- if (slug === "_placeholder") {
-  return (
-   <div className="space-y-8">
-    <header className="mb-8">
-     <Link href="/catequeses" className="inline-flex items-center gap-2 text-stone-400 hover:text-white transition mb-4">
-      ← Voltar às catequeses
-     </Link>
-     <h1 className="text-3xl font-display text-center">Catequese</h1>
-    </header>
-    <p className="text-stone-500 text-center py-8">
-     Nenhuma unidade de catequese disponível no momento.
-    </p>
-   </div>
-  );
- }
-
- const response = await fetchCatechesisLessonsByUnitSlug(slug);
- const lessons: Record<string, unknown>[] = (response.data as Record<string, unknown>[] | undefined) ?? [];
-
- if (!lessons.length) {
-  return (
-   <div className="space-y-8">
-    <header className="mb-8">
-     <Link href="/catequeses" className="inline-flex items-center gap-2 text-stone-400 hover:text-white transition mb-4">
-      ← Voltar às catequeses
-     </Link>
-     <h1 className="text-3xl font-display text-center">Catequese</h1>
-    </header>
-    <p className="text-stone-500 text-center py-8">
-     Nenhuma lição encontrada para esta unidade.
-    </p>
-   </div>
-  );
- }
-
- return (
-  <div className="space-y-8">
-   <header className="mb-8">
-    <Link href="/catequeses" className="inline-flex items-center gap-2 text-stone-400 hover:text-white transition mb-4">
-     ← Voltar às catequeses
-    </Link>
-    <h1 className="text-3xl font-display text-center">Catequese</h1>
-   </header>
-
-   <div className="bg-stone-800/50 rounded-lg p-6">
-    {lessons.map((lesson, index) => {
-     let sections: CatechesisSection[] = [];
-     try {
-      sections = Array.isArray(lesson.sections)
-       ? (lesson.sections as CatechesisSection[])
-       : (JSON.parse(String(lesson.sections)) as CatechesisSection[]);
-     } catch {
-      sections = [];
-     }
-
-     return (
-      <div key={index} className="mb-6 last:mb-0 border-b border-stone-700 pb-6 last:border-0 last:pb-0">
-       {typeof lesson.title === "string" && lesson.title.length > 0 && (
-        <h2 className="font-display text-white mb-3">{lesson.title}</h2>
-       )}
-       {sections.map((section, sIndex) => (
-        <div key={sIndex} className="mb-3 last:mb-0">
-         {section.type === "heading" && (
-          <h3 className="font-display text-white">{String(section.textPt)}</h3>
-         )}
-         {section.type === "rubric" && (
-          <p className="text-sm text-stone-400 italic">{String(section.textPt)}</p>
-         )}
-         {section.type === "verse" && (
-          <>
-           {section.verseNumber && (
-            <span className="text-xs text-stone-500 mr-2">[{String(section.verseNumber)}]</span>
-           )}
-           <span className="font-mono" dir={section.speakerAr ? "rtl" : "ltr"}>
-            {String(section.textPt)}
-           </span>
-           {section.textAr && (
-            <div className="mt-2 text-right" style={{ fontFamily: "'Noto Naskh Arabic', serif", direction: "rtl" }}>
-             {String(section.textAr)}
-            </div>
-           )}
-           {section.textArTransliterated && (
-            <p className="text-sm text-stone-400 italic mt-1">
-             {String(section.textArTransliterated)}
-            </p>
-           )}
-          </>
-         )}
-         {section.type === "note" && (
-          <p className="text-sm text-stone-500 italic">Nota: {String(section.textPt)}</p>
-         )}
-        </div>
-       ))}
+  if (slug === "_placeholder") {
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <p className="text-center text-lit-muted py-8">
+          Nenhuma unidade de catequese disponível no momento.
+        </p>
       </div>
-     );
-    })}
-   </div>
-  </div>
- );
+    );
+  }
+
+  const response = await fetchCatechesisUnit(slug);
+  if (response.error || !response.data) {
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <p className="text-center text-lit-muted py-8">Unidade não encontrada.</p>
+      </div>
+    );
+  }
+
+  const unit = response.data as Record<string, unknown>;
+  const title = String(unit.title ?? "Catequese");
+  const description = String(unit.description ?? "");
+  const body = String(unit.body ?? "");
+  const lessons = Array.isArray(unit.lessons) ? (unit.lessons as Record<string, unknown>[]) : [];
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-10 space-y-8">
+      <header className="mb-2">
+        <Link href="/catequeses" className="inline-flex items-center gap-2 text-stone-400 hover:text-white transition mb-4">
+          ← Voltar às catequeses
+        </Link>
+        <h1 className="text-3xl font-display text-lit-gold">{title}</h1>
+        {description ? (
+          <p className="mt-2 text-lit-text-secondary">{description}</p>
+        ) : null}
+      </header>
+
+      {body ? (
+        <section className="card-liturgical">
+          <h2 className="font-display text-xl text-lit-gold mb-4">Sobre</h2>
+          {renderBody(body)}
+        </section>
+      ) : null}
+
+      {lessons.length > 0 ? (
+        <section className="space-y-4">
+          <h2 className="font-display text-2xl text-lit-gold">Conteúdo</h2>
+          <div className="space-y-4">
+            {lessons.map((lesson) => {
+              const lessonTitle = String(lesson.title ?? "");
+              const lessonBody = String(lesson.body ?? "");
+              return (
+                <div key={String(lesson.slug)} className="card-liturgical">
+                  <h3 className="font-display text-lg text-white">{lessonTitle}</h3>
+                  {lessonBody ? <div className="mt-3">{renderBody(lessonBody)}</div> : null}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+    </div>
+  );
 }
