@@ -1,0 +1,18 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/blog/page": "/blog",
+  "/page": "/",
+  "/servicos/page": "/servicos",
+  "/blog/[slug]/page": "/blog/[slug]",
+  "/catequeses/page": "/catequeses",
+  "/servicos/[slug]/page": "/servicos/[slug]",
+  "/podcast/page": "/podcast",
+  "/catequeses/[slug]/page": "/catequeses/[slug]",
+  "/catequeses/catequese-adultos/page": "/catequeses/catequese-adultos",
+  "/admin/boletim/page": "/admin/boletim",
+  "/admin/blog/page": "/admin/blog",
+  "/admin/page": "/admin",
+  "/admin/servicos/page": "/admin/servicos",
+  "/admin/liturgical/page": "/admin/liturgical",
+  "/admin/zernio/page": "/admin/zernio"
+}
