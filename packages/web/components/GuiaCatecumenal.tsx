@@ -16,10 +16,12 @@ import {
   IconGift,
   IconHome,
   IconInfoCircle,
+  IconMenu,
   IconMessageUser,
   IconMoon,
   IconSun,
   IconStar,
+  IconX,
 } from "@tabler/icons-react";
 
 /* ===== COLORS (mapped to liturgical theme variables) ===== */
@@ -1080,6 +1082,7 @@ const GuiaCatecumenal = () => {
   const [qDone, setQDone] = useState(false);
   const [dark, setDark] = useState(false);
   const [notif, setNotif] = useState<Array<{ id: number; m: string; t: string }>>([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const idx = S.findIndex((s) => s.i === sec);
   const sd = S.find((s) => s.i === sec);
@@ -1180,7 +1183,29 @@ const GuiaCatecumenal = () => {
           : {}),
       }}
     >
-      {/* SIDEBAR */}
+      {/* Mobile overlay backdrop */}
+      <div
+        className="md:hidden"
+        style={{ display: mobileMenuOpen ? "block" : "none" }}
+        onClick={() => setMobileMenuOpen(false)}
+      />
+
+      {/* Mobile header with hamburger */}
+      <div
+        className="md:hidden fixed top-0 left-0 right-0 z-[90] bg-lit-dark text-white flex items-center justify-between px-4 py-3"
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 16, fontWeight: "bold" }}>
+          <IconBuildingChurch size={24} /> Guia Catecumenal
+        </span>
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          style={{ background: "transparent", border: "none", color: "white", cursor: "pointer" }}
+        >
+          {mobileMenuOpen ? <IconX size={24} /> : <IconMenu size={24} />}
+        </button>
+      </div>
+
+      {/* SIDEBAR (desktop fixed, mobile slide-in) */}
       <motion.div
         style={{
           ...st.sb,
@@ -1191,10 +1216,14 @@ const GuiaCatecumenal = () => {
             : {
                 background: "linear-gradient(180deg, var(--lit-dark) 0%, var(--lit-red) 100%)",
               }),
+          ...(mobileMenuOpen
+            ? { position: "fixed", transform: "translateX(0)" }
+            : {}),
         }}
         initial={{ x: -300 }}
-        animate={{ x: 0 }}
+        animate={{ x: mobileMenuOpen ? 0 : -300 }}
         transition={{ duration: 0.5, type: "spring" }}
+        className="md:relative md:translate-x-0"
       >
         <motion.div
           style={{
@@ -1238,7 +1267,10 @@ const GuiaCatecumenal = () => {
                   ...st.ni,
                   ...(isA ? st.nia : {}),
                 }}
-                onClick={() => setSec(s.i)}
+                onClick={() => {
+                  setSec(s.i);
+                  setMobileMenuOpen(false);
+                }}
                 whileHover={{ opacity: 0.8 }}
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -1293,7 +1325,7 @@ const GuiaCatecumenal = () => {
         </div>
       </motion.div>
 
-      {/* HEADER */}
+      {/* HEADER (desktop fixed, mobile relative) */}
       <motion.div
         style={{
           ...st.h,
@@ -1302,7 +1334,11 @@ const GuiaCatecumenal = () => {
                 background: "linear-gradient(90deg, var(--lit-dark) 0%, var(--lit-bg) 100%)",
               }
             : {}),
+          ...(mobileMenuOpen
+            ? { position: "fixed", left: 280, top: 0 }
+            : {}),
         }}
+        className="md:static md:translate-x-0"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
@@ -1351,7 +1387,10 @@ const GuiaCatecumenal = () => {
       </motion.div>
 
       {/* MAIN */}
-      <main style={{ ...st.m, ...(dark ? { color: "white" } : {}) }}>
+      <main
+        className="md:ml-[280px] md:pt-[90px] pt-[60px] w-full"
+        style={{ ...st.m, ...(dark ? { color: "white" } : {}), marginLeft: 0, paddingLeft: 0 }}
+      >
         <AnimatePresence mode="wait">
           {sectionComponents[sec] ?? sectionComponents["bem-vindo"]}
         </AnimatePresence>

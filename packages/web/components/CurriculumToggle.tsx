@@ -14,10 +14,10 @@ export default function CurriculumToggle() {
 
   if (mode === "guide") {
     return (
-      <div className="fixed inset-0 z-50 bg-lit-bg overflow-auto">
+      <div className="fixed inset-0 z-50 bg-lit-bg overflow-auto pt-12">
         <button
           onClick={() => setMode("curriculum")}
-          className="fixed top-4 right-4 z-50 bg-lit-gold text-lit-bg font-semibold px-4 py-2 rounded-lg"
+          className="fixed top-3 left-3 z-[200] bg-lit-gold text-lit-bg font-semibold px-4 py-2 rounded-lg shadow-lg"
         >
           ← Voltar ao currículo
         </button>
@@ -32,7 +32,7 @@ export default function CurriculumToggle() {
         onClick={() => setMode("guide")}
         className="px-4 py-2 bg-lit-gold text-lit-bg font-semibold rounded-lg hover:opacity-90 transition"
       >
-        Ver Guia Catecumenal Interativo ☩
+        Guia Catecumenal Interativo
       </button>
     </div>
   );
