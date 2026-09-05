@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { fetchDay, fetchBulletins, fetchPosts, fetchPodcast } from "@/lib/api";
+import BuzzsproutPlayer from "@/components/BuzzsproutPlayer";
 
 const FAST_LABELS: Record<string, string> = {
   none: "Nenhum jejum",
@@ -246,6 +247,11 @@ export default async function HomePage() {
               <p>Em breve: episódios do podcast &ldquo;No Caminho da Vida&rdquo;</p>
             </div>
           )}
+        </div>
+
+        {/* Buzzsprout player embed */}
+        <div className="mt-6 pt-6 border-t border-stone-700">
+          <BuzzsproutPlayer />
         </div>
       </section>
     </div>
