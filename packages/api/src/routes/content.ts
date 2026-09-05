@@ -126,7 +126,8 @@ export async function handleContentRoutes(
         400,
       );
     }
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
       return jsonResponse({ error: "E-mail inválido." }, 400);
     }
 
