@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchDay, fetchBulletins, fetchPosts } from "@/lib/api";
+import { fetchDay, fetchBulletins, fetchPosts, fetchPodcast } from "@/lib/api";
 
 const FAST_LABELS: Record<string, string> = {
   none: "Nenhum jejum",
@@ -10,10 +10,11 @@ const FAST_LABELS: Record<string, string> = {
 };
 
 export default async function HomePage() {
-  const [dayRes, bulletinsRes, postsRes] = await Promise.all([
+  const [dayRes, bulletinsRes, postsRes, podcastRes] = await Promise.all([
     fetchDay(),
     fetchBulletins(3),
     fetchPosts(3),
+    fetchPodcast(),
   ]);
 
   const day = dayRes.data;
@@ -212,8 +213,39 @@ export default async function HomePage() {
             Ver todos →
           </Link>
         </div>
-        <div className="bg-stone-800/30 rounded-lg p-6 text-center text-stone-400">
-          <p>Em breve: episódios do podcast &ldquo;No Caminho da Vida&rdquo;</p>
+        <div className="space-y-3">
+          {podcastRes.data?.length ? (
+            podcastRes.data.slice(0, 3).map((p: any) => (
+              <div
+                key={p.guid}
+                className="bg-stone-800/50 rounded-lg p-4 hover:bg-stone-800 transition-all duration-300 lit-card"
+              >
+                <span className="text-xs text-stone-400 font-ui uppercase tracking-wide">
+                  {new Date(p.published_at).toLocaleDateString("pt-BR", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+                <h4 className="font-display mt-1 text-white">{p.title}</h4>
+                {p.duration_sec && (
+                  <span className="text-xs text-stone-500">
+                    {(p.duration_sec / 60).toFixed(1)} min
+                  </span>
+                )}
+                <div
+                  className="text-sm text-stone-300 mt-1 line-clamp-2"
+                  dangerouslySetInnerHTML={{
+                    __html: (p.description ?? "").replace(/<[^>]+>/g, "").substring(0, 120) + "…",
+                  }}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="bg-stone-800/30 rounded-lg p-6 text-center text-stone-400">
+              <p>Em breve: episódios do podcast &ldquo;No Caminho da Vida&rdquo;</p>
+            </div>
+          )}
         </div>
       </section>
     </div>
