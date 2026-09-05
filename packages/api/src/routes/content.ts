@@ -130,6 +130,31 @@ export async function handleContentRoutes(
       return jsonResponse({ error: "E-mail inválido." }, 400);
     }
 
+    // Rate limiting: max 3 signups per IP per hour
+    const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+    const rateKey = `signup_limit:${ip}`;
+    const currentCount = parseInt((await env.DAY_CACHE.get(rateKey)) ?? "0");
+    if (currentCount >= 3) {
+      return jsonResponse(
+        { error: "Limite de inscrições por hora atingido. Tente novamente mais tarde." },
+        429,
+      );
+    }
+    await env.DAY_CACHE.put(rateKey, String(currentCount + 1), {
+      expirationTtl: 3600,
+    });
+
+    // Also rate-limit per email to prevent abuse
+    const emailKey = `signup_email:${email}`;
+    const existingSignup = await env.DAY_CACHE.get(emailKey);
+    if (existingSignup) {
+      return jsonResponse(
+        { error: "Este e-mail já foi inscrito recentemente." },
+        409,
+      );
+    }
+    await env.DAY_CACHE.put(emailKey, "1", { expirationTtl: 86400 });
+
     const unit = await env.DB.prepare(
       `SELECT slug FROM catechesis_units WHERE slug = ?`,
     )

@@ -12,15 +12,27 @@ async function fetchApi<T>(
   path: string,
   init?: RequestInit
 ): Promise<ApiResponse<T>> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: { "Content-Type": "application/json", ...init?.headers },
-  });
-  if (!res.ok) return { error: `[${res.status}] ${res.statusText}` };
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
   try {
-    return { data: (await res.json()) as T };
-  } catch {
-    return { error: "Invalid JSON" };
+    const res = await fetch(`${API_BASE}${path}`, {
+      ...init,
+      signal: controller.signal,
+      headers: { "Content-Type": "application/json", ...init?.headers },
+    });
+    if (!res.ok) return { error: `[${res.status}] ${res.statusText}` };
+    try {
+      return { data: (await res.json()) as T };
+    } catch {
+      return { error: "Invalid JSON" };
+    }
+  } catch (e) {
+    if (e instanceof Error && e.name === "AbortError") {
+      return { error: "Request timeout" };
+    }
+    return { error: e instanceof Error ? e.message : "Network error" };
+  } finally {
+    clearTimeout(timeout);
   }
 }
 

@@ -1,7 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import GuiaCatecumenal from "@/components/GuiaCatecumenal";
+import dynamic from "next/dynamic";
+
+const GuiaCatecumenal = dynamic(() => import("@/components/GuiaCatecumenal"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center min-h-[200px]">
+      <div className="text-lit-gold font-display text-lg">Carregando guia...</div>
+    </div>
+  ),
+});
 
 /**
  * Toggle between the database-backed curriculum (default) and the
@@ -14,12 +23,12 @@ export default function CurriculumToggle() {
 
   if (mode === "guide") {
     return (
-      <div className="fixed inset-0 z-50 bg-lit-bg overflow-auto pt-12">
+      <div className="fixed inset-0 z-50 bg-lit-bg overflow-auto pt-14 md:pt-0">
         <button
           onClick={() => setMode("curriculum")}
           className="fixed top-3 left-3 z-[200] bg-lit-gold text-lit-bg font-semibold px-4 py-2 rounded-lg shadow-lg"
         >
-          ← Voltar ao currículo
+          Voltar ao currículo
         </button>
         <GuiaCatecumenal />
       </div>
