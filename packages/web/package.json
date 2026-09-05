@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@sao-jorge/shared": "file:../shared",
+    "@tabler/icons-react": "^3.46.0",
     "@zernio/node": "^0.2.419",
     "framer-motion": "^13.2.0",
     "next": "^15.3.9",
