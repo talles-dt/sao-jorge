@@ -126,164 +126,63 @@ const S = [
   { i: "leituras" as const, t: "Leituras", st: "Recursos para estudo", ic: <IconBook size={24} />, c: c.p, q: null },
 ];
 
-/* ===== STYLES ===== */
-const st: Record<string, React.CSSProperties> = {
-  c: {
-    minHeight: "100vh",
-    background: "var(--lit-bg)",
-    fontFamily: "'Georgia', 'Times New Roman', serif",
-    display: "flex",
-    overflow: "hidden",
-    color: "var(--lit-text)",
-  },
-  sb: {
-    width: 280,
-    color: "white",
-    padding: "20px 0",
-    position: "fixed",
-    height: "100vh",
-    overflowY: "auto",
-    zIndex: 100,
-    boxShadow: "2px 0 10px rgba(0,0,0,0.1)",
-  },
-  m: {
-    flex: 1,
-    marginLeft: 280,
-    padding: "100px 40px 40px",
-    overflowY: "auto",
-    maxHeight: "100vh",
-  },
-  h: {
-    background: "var(--lit-dark)",
-    color: "white",
-    padding: "15px 40px",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    position: "fixed",
-    top: 0,
-    left: 280,
-    right: 0,
-    zIndex: 99,
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-  },
-  lg: { display: "flex", alignItems: "center", gap: 10, fontSize: 18, fontWeight: "bold" },
-  pb: { height: 6, background: "var(--lit-bg)", borderRadius: 3, overflow: "hidden", margin: "0 20px" },
-  pf: {
-    height: "100%",
-    background: "linear-gradient(90deg, var(--lit-gold), var(--lit-red))",
-    borderRadius: 3,
-    transition: "width 0.5s ease",
-  },
-  ni: {
-    padding: "12px 20px",
-    margin: "5px 15px",
-    borderRadius: 8,
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    fontSize: 14,
-  },
-  nia: { background: "var(--lit-gold)", color: "var(--lit-dark)", fontWeight: "bold" },
-  nih: { background: "rgba(255,255,255,0.1)" },
-  sc: { maxWidth: 1000, margin: "0 auto" },
-  sh: { marginBottom: 30, paddingBottom: 20, borderBottom: `2px solid var(--lit-gold)` },
-  st: { fontSize: 32, margin: 0, display: "flex", alignItems: "center", gap: 15 },
-  sst: { fontSize: 18, fontStyle: "italic", margin: "10px 0 0 0" },
-  card: {
-    background: "var(--lit-light)",
-    borderRadius: 12,
-    padding: 25,
-    margin: "20px 0",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-    border: `1px solid ${c.b}`,
-    transition: "all 0.3s ease",
-  },
-  ch: { boxShadow: "0 8px 30px rgba(0,0,0,0.15)", transform: "translateY(-2px)" },
-  hc: {
-    background: "linear-gradient(135deg, var(--lit-gold)15, var(--lit-red)08)",
-    borderLeft: `4px solid var(--lit-gold)`,
-    borderRadius: 12,
-    padding: 25,
-    margin: "20px 0",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-  },
-  qc: {
-    background: "var(--lit-light)",
-    border: `2px solid var(--lit-gold)`,
-    borderRadius: 12,
-    padding: 25,
-    margin: "20px 0",
-  },
-  bt: {
-    padding: "12px 24px",
-    borderRadius: 8,
-    border: "none",
-    cursor: "pointer",
-    fontSize: 16,
-    fontWeight: "bold",
-    transition: "all 0.3s ease",
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-  },
-  btp: { background: "var(--lit-dark)", color: "var(--lit-gold)" },
-  bts: { background: "var(--lit-red)", color: "white" },
-  bta: { background: "var(--lit-gold)", color: "var(--lit-dark)" },
-  bth: { opacity: 0.9, transform: "scale(1.02)" },
-  quote: {
-    fontStyle: "italic",
-    color: "var(--lit-gold)",
-    padding: "20px 30px",
-    borderLeft: `4px solid var(--lit-gold)`,
-    background: "var(--lit-bg)",
-    margin: "25px 0",
-    borderRadius: "0 8px 8px 0",
-    fontSize: 18,
-    lineHeight: 1.8,
-  },
-  tl: { position: "relative", paddingLeft: 40, margin: "30px 0" },
-  tll: { position: "absolute", left: 15, top: 0, bottom: 0, width: 2, background: "var(--lit-dark)" },
-  tli: { position: "relative", paddingLeft: 30, marginBottom: 30 },
-  td: {
-    position: "absolute",
-    left: -40,
-    top: 8,
-    width: 24,
-    height: 24,
-    background: "var(--lit-gold)",
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "var(--lit-dark)",
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  tt: { fontWeight: "bold", fontSize: 16, marginBottom: 5 },
-  tc: { background: "var(--lit-bg)", padding: 12, borderRadius: 8, marginLeft: 20, fontSize: 14 },
-  f: { textAlign: "center", padding: "30px 0", fontSize: 14, borderTop: `1px solid ${c.b}`, marginTop: 40 },
+/* ===== STYLES (Tailwind class names) ===== */
+function cx(...classes: (string | undefined | false)[]): string {
+  return classes.filter(Boolean).join(" ");
+}
+
+const st: Record<string, string> = {
+  c: "min-h-screen bg-lit-bg font-serif flex overflow-hidden text-lit-text",
+  sb: "w-[280px] text-white py-[20px] fixed h-screen overflow-y-auto z-[100] shadow-[2px_0_10px_rgba(0,0,0,0.1)]",
+  m: "flex-1 ml-[280px] pt-[100px] px-[40px] pb-[40px] overflow-y-auto max-h-screen",
+  h: "bg-lit-dark text-white px-[15px_40px] flex justify-between items-center fixed top-0 left-[280px] right-0 z-[99] shadow-[0_2px_10px_rgba(0,0,0,0.1)]",
+  lg: "flex items-center gap-[10px] text-[18px] font-bold",
+  pb: "h-[6px] bg-lit-bg rounded-[3px] overflow-hidden m-[0_20px]",
+  pf: "h-full bg-gradient-to-r from-lit-gold to-lit-red rounded-[3px] transition-[width_0.5s_ease]",
+  ni: "px-[12px_20px] m-[5px_15px] rounded-[8px] cursor-pointer transition-all-[all_0.3s_ease] flex items-center gap-[10px] text-[14px]",
+  nia: "bg-lit-gold text-lit-dark font-bold",
+  nih: "bg-[rgba(255,255,255,0.1)]",
+  sc: "max-w-[1000px] mx-auto",
+  sh: "mb-[30px] pb-[20px] border-b-[2px] border-lit-gold",
+  st: "text-[32px] m-0 flex items-center gap-[15px]",
+  sst: "text-[18px] italic mt-[10px_0_0_0]",
+  card: "bg-lit-light rounded-[12px] p-[25px] m-[20px_0] shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-lit-border transition-all-[all_0.3s_ease]",
+  ch: "shadow-[0_8px_30px_rgba(0,0,0,0.15)] translate-y-[-2px]",
+  hc: "bg-gradient-to-br from-lit-gold/15 to-lit-red/8 border-l-[4px] border-lit-gold rounded-[12px] p-[25px] m-[20px_0] shadow-[0_4px_20px_rgba(0,0,0,0.08)]",
+  qc: "bg-lit-light border-[2px] border-lit-gold rounded-[12px] p-[25px] m-[20px_0]",
+  bt: "px-[12px_24px] rounded-[8px] border-none cursor-pointer text-[16px] font-bold transition-all-[all_0.3s_ease] inline-flex items-center gap-[8px]",
+  btp: "bg-lit-dark text-lit-gold",
+  bts: "bg-lit-red text-white",
+  bta: "bg-lit-gold text-lit-dark",
+  bth: "opacity-90 scale-102",
+  quote: "italic text-lit-gold p-[20px_30px] border-l-[4px] border-lit-gold bg-lit-bg m-[25px_0] rounded-[0_8px_8px_0] text-[18px] leading-[1.8]",
+  tl: "relative pl-[40px] m-[30px_0]",
+  tll: "absolute left-[15px] top-0 bottom-0 w-[2px] bg-lit-dark",
+  tli: "relative pl-[30px] mb-[30px]",
+  td: "absolute left-[-40px] top-[8px] w-[24px] h-[24px] bg-lit-gold rounded-full flex items-center justify-center text-lit-dark text-[12px] font-bold",
+  tt: "font-bold text-[16px] mb-[5px]",
+  tc: "bg-lit-bg p-[12px] rounded-[8px] ml-[20px] text-[14px]",
+  f: "text-center py-[30px] text-[14px] border-t-[1px] border-lit-border mt-[40px]",
 };
+
 
 /* ===== SECTION COMPONENTS ===== */
 const BemVindo = ({ onStart }: { onStart: () => void }) => (
-  <div style={st.sc}>
-    <motion.div style={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-      <h1 style={st.st}>
+  <div className={st.sc}>
+    <motion.div className={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+      <h1 className={st.st}>
         <IconHome size={32} color="var(--lit-gold)" /> Bem-Vindo ao Guia Catecumenal
       </h1>
-      <p style={st.sst}>Início da sua jornada espiritual na Paróquia São Jorge</p>
+      <p className={st.sst}>Início da sua jornada espiritual na Paróquia São Jorge</p>
     </motion.div>
-    <motion.div style={st.card} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
-      <h2 style={{ margin: "0 0 15px 0", fontSize: 22 }}>Querido Catecúmeno,</h2>
-      <p style={{ lineHeight: 1.8, marginBottom: 20 }}>
+    <motion.div className={st.card} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+      <h2 className="m-[0 0 15px 0] text-[22]">Querido Catecúmeno,</h2>
+      <p className="leading-[1.8] mb-[20]">
         Seja bem-vindo a este caminho de <strong>descoberta, cura e transformação</strong> na Santa Igreja
         Ortodoxa. Este guia interativo foi preparado para acompanhá-lo em sua jornada catecumenal.
       </p>
-      <p style={{ lineHeight: 1.8, marginBottom: 20 }}>Aqui você encontrará:</p>
-      <ul style={{ paddingLeft: 25, marginBottom: 20, lineHeight: 1.8 }}>
+      <p className="leading-[1.8] mb-[20]">Aqui você encontrará:</p>
+      <ul className="pl-[25] mb-[20] leading-[1.8]">
         <li><strong>Fundamentos da Fé:</strong> Ensinamentos essenciais</li>
         <li><strong>Vida Sacramental:</strong> Santos Missérios</li>
         <li><strong>Práticas Espirituais:</strong> Oração, jejum, ascese</li>
@@ -291,9 +190,9 @@ const BemVindo = ({ onStart }: { onStart: () => void }) => (
         <li><strong>Recursos:</strong> Leituras e materiais</li>
       </ul>
     </motion.div>
-    <motion.div style={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
-      <h3 style={{ margin: "0 0 15px 0", fontSize: 20 }}>Como usar este guia:</h3>
-      <ol style={{ paddingLeft: 25, lineHeight: 1.8 }}>
+    <motion.div className={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+      <h3 className="m-[0 0 15px 0] text-[20]">Como usar este guia:</h3>
+      <ol className="pl-[25] leading-[1.8]">
         <li><strong>Navegue</strong> pelo menu lateral</li>
         <li><strong>Responda</strong> aos quizzes</li>
         <li><strong>Acompanhe</strong> seu progresso</li>
@@ -302,13 +201,13 @@ const BemVindo = ({ onStart }: { onStart: () => void }) => (
       </ol>
     </motion.div>
     <motion.div
-      style={{ textAlign: "center", marginTop: 40 }}
+      className="text-center mt-[40]"
       initial={{ y: 30, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.5 }}
     >
       <motion.button
-        style={{ ...st.bt, ...st.btp, padding: "15px 40px", fontSize: 18 }}
+        className={cx(st.bt, st.btp, "p-[15px 40px]")}
         onClick={onStart}
         whileHover={{ opacity: 0.9, scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -317,10 +216,10 @@ const BemVindo = ({ onStart }: { onStart: () => void }) => (
         <IconChevronRight size={20} />
       </motion.button>
     </motion.div>
-    <motion.div style={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}>
+    <motion.div className={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}>
       "O caminho para Deus não é um caminho de teorias, mas de amor."
       <br />
-      <footer style={{ fontStyle: "normal", marginTop: 10, fontSize: 14 }}>— Santo Inácio de Antioquia</footer>
+      <footer className="mt-[10] text-[14]">— Santo Inácio de Antioquia</footer>
     </motion.div>
   </div>
 );
@@ -334,15 +233,15 @@ const Fundamentos = () => {
     { i: 4, t: "Cristologia", c: "Jesus Cristo é Verdadeiro Deus e Verdadeiro Homem.", ic: <IconCross size={28} color="var(--lit-gold)" /> },
   ];
   return (
-    <div style={st.sc}>
-      <motion.div style={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-        <h1 style={st.st}>
+    <div className={st.sc}>
+      <motion.div className={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+        <h1 className={st.st}>
           <IconStar size={32} color="var(--lit-gold)" /> Fundamentos da Fé Ortodoxa
         </h1>
-        <p style={st.sst}>Os pilares que sustentam a nossa fé</p>
+        <p className={st.sst}>Os pilares que sustentam a nossa fé</p>
       </motion.div>
       <motion.p
-        style={{ fontSize: 18, lineHeight: 1.8, marginBottom: 30 }}
+        className="text-[18] leading-[1.8] mb-[30]"
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
@@ -350,23 +249,23 @@ const Fundamentos = () => {
         A fé ortodoxa é <strong>apostólica, patrística e litúrgica</strong>. Não é uma invenção humana,
         mas a <strong>Tradição viva</strong> transmitida por Cristo aos Apóstolos.
       </motion.p>
-      <motion.h3 style={{ margin: "30px 0 20px 0", fontSize: 22 }} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+      <motion.h3 className="m-[30px 0 20px 0] text-[22]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
         Os Quatro Pilares
       </motion.h3>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 20, marginBottom: 40 }}>
+      <div className="flex flex-wrap gap-20 mb-[40]">
         {cards.map((card, i) => (
           <motion.div
             key={card.i}
-            style={{ ...st.card, flex: "1 1 calc(25% - 20px)", minWidth: 280, cursor: "pointer" }}
+            className={cx(st.card, "flex-[1_1_calc(25%_-_20px)] cursor-pointer")}
             onClick={() => setExp(exp === card.i ? null : card.i)}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.5 + i * 0.1 }}
             whileHover={{ opacity: 0.9, scale: 1.02 }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 15, marginBottom: 15 }}>
+            <div className="flex items-center gap-15 mb-[15]">
               {card.ic}
-              <h3 style={{ margin: 0, fontSize: 16 }}>{card.t}</h3>
+              <h3 className="m-0 text-[16]">{card.t}</h3>
             </div>
             <AnimatePresence>
               {exp === card.i && (
@@ -376,13 +275,13 @@ const Fundamentos = () => {
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
-                  style={{ lineHeight: 1.6 }}
+                  className="leading-[1.6]"
                 >
                   {card.c}
                 </motion.p>
               )}
             </AnimatePresence>
-            <motion.div style={{ marginTop: 10, textAlign: "right" }}>
+            <motion.div className="mt-[10] text-right">
               <motion.span animate={{ rotate: exp === card.i ? 180 : 0 }} transition={{ duration: 0.3 }}>
                 <IconChevronRight size={18} color="var(--lit-gold)" />
               </motion.span>
@@ -390,12 +289,12 @@ const Fundamentos = () => {
           </motion.div>
         ))}
       </div>
-      <motion.div style={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
-        <h3 style={{ margin: "0 0 20px 0", fontSize: 20 }}>A Santíssima Trindade</h3>
-        <p style={{ textAlign: "center", fontStyle: "italic", color: "var(--lit-red)", marginBottom: 20 }}>
+      <motion.div className={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
+        <h3 className="m-[0 0 20px 0] text-[20]">A Santíssima Trindade</h3>
+        <p className="text-center italic text-[color:var(--lit-red)] mb-[20]">
           "Um só Deus em Três Pessoas: Pai, Filho e Espírito Santo"
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 20 }}>
+        <div className="grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-20">
           {[
             { t: "Deus Pai", d: "Fonte da Divindade" },
             { t: "Deus Filho", d: "Verbo de Deus feito homem" },
@@ -403,46 +302,30 @@ const Fundamentos = () => {
           ].map((x, i) => (
             <motion.div
               key={i}
-              style={st.card}
+              className={st.card}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 + i * 0.1 }}
             >
               <h4
-                style={{
-                  color: "var(--lit-red)",
-                  margin: "0 0 10px 0",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
+                className="text-[color:var(--lit-red)] m-[0 0 10px 0] flex items-center gap-8"
               >
                 <span
-                  style={{
-                    width: 30,
-                    height: 30,
-                    background: "var(--lit-dark)",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginRight: 10,
-                    color: "var(--lit-gold)",
-                  }}
+                  className="w-[30] h-30 bg-[color:var(--lit-dark)] rounded-full flex items-center justify-center mr-[10] text-[color:var(--lit-gold)]"
                 >
                   {i + 1}
                 </span>
                 {x.t}
               </h4>
-              <p style={{ margin: 0 }}>{x.d}</p>
+              <p className="m-0">{x.d}</p>
             </motion.div>
           ))}
         </div>
       </motion.div>
-      <motion.div style={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }}>
+      <motion.div className={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }}>
         "A fé não é um assentimento intelectual abstrato, mas uma comunhão vivencial com Deus."
         <br />
-        <footer style={{ fontStyle: "normal", marginTop: 10, fontSize: 14 }}>— Tradição Patrística</footer>
+        <footer className="mt-[10] text-[14]">— Tradição Patrística</footer>
       </motion.div>
     </div>
   );
@@ -485,18 +368,18 @@ const Sacramentos = () => {
     },
   ];
   return (
-    <div style={st.sc}>
-      <motion.div style={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-        <h1 style={st.st}>
+    <div className={st.sc}>
+      <motion.div className={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+        <h1 className={st.st}>
           <IconBuildingChurch size={32} color="var(--lit-gold)" /> Vida Sacramental
         </h1>
-        <p style={st.sst}>Os Santos Mistérios da Igreja</p>
+        <p className={st.sst}>Os Santos Mistérios da Igreja</p>
       </motion.div>
-      <motion.p style={{ fontSize: 18, lineHeight: 1.8, marginBottom: 30 }} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+      <motion.p className="text-[18] leading-[1.8] mb-[30]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
         Os <strong>Santos Mistérios</strong> são meios de graça pelos quais Deus age em nossas vidas.
       </motion.p>
       <motion.div
-        style={{ display: "flex", gap: 10, marginBottom: 30, flexWrap: "wrap" }}
+        className="flex gap-10 mb-[30] flex-wrap"
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}
@@ -504,21 +387,14 @@ const Sacramentos = () => {
         {s.map((x, i) => (
           <motion.button
             key={x.i}
-            style={{
-              ...st.bt,
-              ...(tab === x.i ? st.bta : st.bts),
-              flex: "1 1 calc(25% - 10px)",
-              minWidth: 200,
-              justifyContent: "center",
-              padding: "15px 10px",
-            }}
+            className={cx(st.bt, "flex-[1_1_calc(25%_-_10px)] justify-center p-[15px 10px]")}
             onClick={() => setTab(x.i)}
             whileHover={{ opacity: 0.9, scale: 1.02 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 + i * 0.1 }}
           >
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+            <div className="flex flex-col items-center gap-8">
               {x.ic}
               <span>{x.t}</span>
             </div>
@@ -531,30 +407,22 @@ const Sacramentos = () => {
             tab === x.i && (
               <motion.div
                 key={x.i}
-                style={st.hc}
+                className={st.hc}
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
               >
-                <h3 style={{ margin: "0 0 15px 0", fontSize: 24, display: "flex", alignItems: "center", gap: 10 }}>
+                <h3 className="m-[0 0 15px 0] text-[24] flex items-center gap-10">
                   {x.ic}
                   {x.t}
                 </h3>
-                <p style={{ fontSize: 16, lineHeight: 1.8, marginBottom: 15 }}>
+                <p className="text-[16] leading-[1.8] mb-[15]">
                   <strong>Significado:</strong> {x.d}
                 </p>
-                <p style={{ fontSize: 16, lineHeight: 1.8, marginBottom: 20 }}>{x.det}</p>
+                <p className="text-[16] leading-[1.8] mb-[20]">{x.det}</p>
                 <motion.div
-                  style={{
-                    padding: 15,
-                    background: "var(--lit-bg)",
-                    borderRadius: 8,
-                    borderLeft: `4px solid var(--lit-gold)`,
-                    fontSize: 14,
-                    color: "var(--lit-red)",
-                    fontStyle: "italic",
-                  }}
+                  className="p-[15] bg-[color:var(--lit-bg)] rounded-[8] border-l-[4px solid var(--lit-gold)] text-[14] text-[color:var(--lit-red)] italic"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
@@ -565,9 +433,9 @@ const Sacramentos = () => {
             ),
         )}
       </AnimatePresence>
-      <motion.div style={st.card} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }}>
-        <h3 style={{ margin: "0 0 20px 0", fontSize: 20 }}>Preparação para a Comunhão</h3>
-        <ol style={{ paddingLeft: 25, lineHeight: 1.8 }}>
+      <motion.div className={st.card} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }}>
+        <h3 className="m-[0 0 20px 0] text-[20]">Preparação para a Comunhão</h3>
+        <ol className="pl-[25] leading-[1.8]">
           <li><strong>Confissão:</strong> Confessar-se regularmente</li>
           <li><strong>Jejum:</strong> Desde a meia-noite</li>
           <li><strong>Oração:</strong> Orações preparatórias</li>
@@ -575,10 +443,10 @@ const Sacramentos = () => {
           <li><strong>Chegada:</strong> Antedência para a Liturgia</li>
         </ol>
       </motion.div>
-      <motion.div style={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.9 }}>
+      <motion.div className={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.9 }}>
         "A Eucaristia é o centro da vida da Igreja, o sacramento dos sacramentos."
         <br />
-        <footer style={{ fontStyle: "normal", marginTop: 10, fontSize: 14 }}>— São João Crisóstomo</footer>
+        <footer className="mt-[10] text-[14]">— São João Crisóstomo</footer>
       </motion.div>
     </div>
   );
@@ -593,35 +461,35 @@ const Espiritualidade = () => {
     { i: 3, t: "Combate às Paixões", ic: <IconCross size={32} color="var(--lit-gold)" />, d: "Libertação do pecado", det: "Identifique, confesse, vigie, ore, jejue, pratique virtudes.", tip: "As paixões nos afastam de Deus." },
   ];
   return (
-    <div style={st.sc}>
-      <motion.div style={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-        <h1 style={st.st}>
+    <div className={st.sc}>
+      <motion.div className={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+        <h1 className={st.st}>
           <IconMoon size={32} color="var(--lit-gold)" /> Vida Espiritual e Ascese
         </h1>
-        <p style={st.sst}>Oração, jejum e combate às paixões</p>
+        <p className={st.sst}>Oração, jejum e combate às paixões</p>
       </motion.div>
-      <motion.p style={{ fontSize: 18, lineHeight: 1.8, marginBottom: 30 }} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+      <motion.p className="text-[18] leading-[1.8] mb-[30]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
         A vida cristã ortodoxa é uma <strong>jornada de transformação</strong> (Theosis) em que nos tornamos cada vez mais semelhantes a Cristo.
       </motion.p>
-      <motion.h3 style={{ margin: "30px 0 20px 0", fontSize: 22 }} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+      <motion.h3 className="m-[30px 0 20px 0] text-[22]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
         As Quatro Práticas
       </motion.h3>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 40 }}>
+      <div className="grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-20 mb-[40]">
         {p.map((x, i) => (
           <motion.div
             key={x.i}
-            style={{ ...st.card, cursor: "pointer", border: exp === x.i ? `2px solid var(--lit-gold)` : "none" }}
+            className={cx(st.card, "cursor-pointer")}
             onClick={() => setExp(exp === x.i ? null : x.i)}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 + i * 0.1 }}
             whileHover={{ opacity: 0.9, scale: 1.02 }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 15, marginBottom: 15 }}>
+            <div className="flex items-center gap-15 mb-[15]">
               {x.ic}
-              <h3 style={{ margin: 0, fontSize: 18 }}>{x.t}</h3>
+              <h3 className="m-0 text-[18]">{x.t}</h3>
             </div>
-            <p style={{ lineHeight: 1.6, marginBottom: 10 }}>{x.d}</p>
+            <p className="leading-[1.6] mb-[10]">{x.d}</p>
             <AnimatePresence>
               {exp === x.i && (
                 <motion.div
@@ -631,16 +499,9 @@ const Espiritualidade = () => {
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <p style={{ lineHeight: 1.6, marginBottom: 10 }}>{x.det}</p>
+                  <p className="leading-[1.6] mb-[10]">{x.det}</p>
                   <div
-                    style={{
-                      padding: 10,
-                      background: "var(--lit-bg)",
-                      borderRadius: 6,
-                      borderLeft: `3px solid var(--lit-gold)`,
-                      fontSize: 14,
-                      color: "var(--lit-red)",
-                    }}
+                    className="p-[10] bg-[color:var(--lit-bg)] rounded-[6] border-l-[3px solid var(--lit-gold)] text-[14] text-[color:var(--lit-red)]"
                   >
                     <strong>Dica:</strong> {x.tip}
                   </div>
@@ -650,40 +511,34 @@ const Espiritualidade = () => {
           </motion.div>
         ))}
       </div>
-      <motion.div style={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
-        <h3 style={{ margin: "0 0 20px 0", fontSize: 20 }}>A Oração de Jesus</h3>
+      <motion.div className={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
+        <h3 className="m-[0 0 20px 0] text-[20]">A Oração de Jesus</h3>
         <motion.div
-          style={{
-            padding: 20,
-            background: "linear-gradient(135deg, var(--lit-gold)15, var(--lit-red)08)",
-            borderRadius: 8,
-            textAlign: "center",
-            marginBottom: 20,
-          }}
+          className="p-[20] rounded-[8] text-center mb-[20]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <p style={{ fontSize: 20, fontStyle: "italic", margin: 0 }}>
+          <p className="text-[20] italic m-0">
             "Senhor Jesus Cristo, Filho de Deus,
             <br />
             tem misericórdia de mim, pecador"
           </p>
         </motion.div>
-        <p style={{ lineHeight: 1.8, marginBottom: 15 }}>
+        <p className="leading-[1.8] mb-[15]">
           <strong>Origem:</strong> Baseada na oração do publicano (Lc 18:13).
         </p>
-        <p style={{ lineHeight: 1.8, marginBottom: 15 }}>
+        <p className="leading-[1.8] mb-[15]">
           <strong>Prática:</strong> Repetir com o coração, sincronizada com a respiração.
         </p>
-        <p style={{ lineHeight: 1.8, marginBottom: 0 }}>
+        <p className="leading-[1.8] mb-[0]">
           <strong>Benefícios:</strong> Purifica o coração, traz paz, protege, une a Cristo.
         </p>
       </motion.div>
-      <motion.div style={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }}>
+      <motion.div className={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }}>
         "A alma que deseja aproximar-se de Deus deve primeiro purificar-se das paixões."
         <br />
-        <footer style={{ fontStyle: "normal", marginTop: 10, fontSize: 14 }}>— São Doroteu de Gaza</footer>
+        <footer className="mt-[10] text-[14]">— São Doroteu de Gaza</footer>
       </motion.div>
     </div>
   );
@@ -704,40 +559,40 @@ const Liturgia = () => {
     { n: "Jejum do Natal", d: "40 dias", desc: "De 15 Nov a 24 Dez" },
   ];
   return (
-    <div style={st.sc}>
-      <motion.div style={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-        <h1 style={st.st}>
+    <div className={st.sc}>
+      <motion.div className={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+        <h1 className={st.st}>
           <IconCalendar size={32} color="var(--lit-gold)" /> Ciclo Litúrgico
         </h1>
-        <p style={st.sst}>Festas, jejuns e celebrações</p>
+        <p className={st.sst}>Festas, jejuns e celebrações</p>
       </motion.div>
-      <motion.p style={{ fontSize: 18, lineHeight: 1.8, marginBottom: 30 }} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+      <motion.p className="text-[18] leading-[1.8] mb-[30]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
         A Igreja vive segundo um <strong>calendário litúrgico</strong> que nos ajuda a meditar os mistérios da salvação.
       </motion.p>
-      <motion.h3 style={{ margin: "30px 0 20px 0", fontSize: 22 }} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+      <motion.h3 className="m-[30px 0 20px 0] text-[22]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
         As Grandes Festas
       </motion.h3>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 40 }}>
+      <div className="grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-20 mb-[40]">
         {f.map((x, i) => (
           <motion.div
             key={i}
-            style={{ ...st.card, cursor: "pointer" }}
+            className={cx(st.card, "cursor-pointer")}
             onClick={() => setExp(exp === i ? null : i)}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 + i * 0.1 }}
             whileHover={{ opacity: 0.9, scale: 1.02 }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 15 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div className="flex justify-between items-center mb-[15]">
+              <div className="flex items-center gap-10">
                 {x.ic}
-                <h3 style={{ margin: 0, fontSize: 16 }}>{x.t}</h3>
+                <h3 className="m-0 text-[16]">{x.t}</h3>
               </div>
-              <span style={{ fontSize: 12, color: "var(--lit-red)" }}>
+              <span className="text-[12] text-[color:var(--lit-red)]">
                 {x.d}
               </span>
             </div>
-            <p style={{ lineHeight: 1.6, marginBottom: 10 }}>{x.det}</p>
+            <p className="leading-[1.6] mb-[10]">{x.det}</p>
             <AnimatePresence>
               {exp === i && (
                 <motion.p
@@ -746,7 +601,7 @@ const Liturgia = () => {
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
-                  style={{ lineHeight: 1.6, fontSize: 14 }}
+                  className="leading-[1.6] text-[14]"
                 >
                   {x.det}
                 </motion.p>
@@ -755,72 +610,64 @@ const Liturgia = () => {
           </motion.div>
         ))}
       </div>
-      <motion.div style={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
-        <h3 style={{ margin: "0 0 20px 0", fontSize: 20 }}>Períodos de Jejum</h3>
-        <p style={{ lineHeight: 1.8, marginBottom: 20 }}>
+      <motion.div className={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
+        <h3 className="m-[0 0 20px 0] text-[20]">Períodos de Jejum</h3>
+        <p className="leading-[1.8] mb-[20]">
           Os jejuns são <strong>ferramentas espirituais</strong> para disciplinar corpo e alma.
         </p>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 400 }}>
+        <div className="overflow-x-auto">
+          <table className="w-[100%] min-w-[400]">
             <thead>
               <tr>
-                <th style={{ textAlign: "left", padding: 12, color: "white", borderBottom: `1px solid ${c.b}` }}>Jejuno</th>
-                <th style={{ textAlign: "left", padding: 12, color: "white", borderBottom: `1px solid ${c.b}` }}>Duração</th>
-                <th style={{ textAlign: "left", padding: 12, color: "white", borderBottom: `1px solid ${c.b}` }}>Descrição</th>
+                <th className="text-left text-white border-lit-border border-lit-border">Jejuno</th>
+                <th className="text-left text-white border-lit-border border-lit-border">Duração</th>
+                <th className="text-left text-white border-lit-border border-lit-border">Descrição</th>
               </tr>
             </thead>
             <tbody>
               {j.map((x, i) => (
                 <tr key={i}>
-                  <td style={{ padding: 12, borderBottom: `1px solid ${c.b}` }}>
+                  <td className="border-lit-border border-lit-border">
                     <strong>{x.n}</strong>
                   </td>
-                  <td style={{ padding: 12, borderBottom: `1px solid ${c.b}` }}>{x.d}</td>
-                  <td style={{ padding: 12, borderBottom: `1px solid ${c.b}` }}>{x.desc}</td>
+                  <td className="border-lit-border border-lit-border">{x.d}</td>
+                  <td className="border-lit-border border-lit-border">{x.desc}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <motion.div
-          style={{
-            marginTop: 20,
-            padding: 10,
-            background: "var(--lit-bg)",
-            borderRadius: 6,
-            borderLeft: `3px solid var(--lit-gold)`,
-            fontSize: 14,
-            color: "var(--lit-red)",
-          }}
+          className="mt-[20] p-[10] bg-[color:var(--lit-bg)] rounded-[6] border-l-[3px solid var(--lit-gold)] text-[14] text-[color:var(--lit-red)]"
         >
           <strong>Nota:</strong> Crianças, idosos, doentes, grávidas e amamentando estão isentos.
         </motion.div>
       </motion.div>
-      <motion.div style={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }}>
+      <motion.div className={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }}>
         "O ano litúrgico é como uma grande sinfonia da salvação."
         <br />
-        <footer style={{ fontStyle: "normal", marginTop: 10, fontSize: 14 }}>— Tradição Litúrgica</footer>
+        <footer className="mt-[10] text-[14]">— Tradição Litúrgica</footer>
       </motion.div>
     </div>
   );
 };
 
 const Historia = () => (
-  <div style={st.sc}>
-    <motion.div style={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-      <h1 style={st.st}>
+  <div className={st.sc}>
+    <motion.div className={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+      <h1 className={st.st}>
         <IconBook size={32} color="var(--lit-gold)" /> História e Tradição
       </h1>
-      <p style={st.sst}>A Igreja Apostólica</p>
+      <p className={st.sst}>A Igreja Apostólica</p>
     </motion.div>
-    <motion.p style={{ fontSize: 18, lineHeight: 1.8, marginBottom: 30 }} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+    <motion.p className="text-[18] leading-[1.8] mb-[30]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
       Conhecer a <strong>história da Igreja</strong> nos ajuda a entender que a fé ortodoxa é a{" "}
       <strong>Tradição Apostólica</strong> preservada ao longo de 2000 anos.
     </motion.p>
-    <motion.div style={st.card} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
-      <h3 style={{ margin: "0 0 20px 0", fontSize: 20 }}>Linha do Tempo</h3>
-      <div style={st.tl}>
-        <div style={st.tll} />
+    <motion.div className={st.card} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+      <h3 className="m-[0 0 20px 0] text-[20]">Linha do Tempo</h3>
+      <div className={st.tl}>
+        <div className={st.tll} />
         {[
           { y: 0.5, t: "Século I — Era Apostólica", c: "Os Apóstolos pregam e fundam comunidades." },
           { y: 0.6, t: "Século II — Pais Apostólicos", c: "Discípulos dos Apóstolos escrevem cartas." },
@@ -830,108 +677,100 @@ const Historia = () => (
         ].map((x, i) => (
           <motion.div
             key={i}
-            style={st.tli}
+            className={st.tli}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 + i * 0.1 }}
           >
-            <div style={st.td}>{i + 1}</div>
-            <div style={st.tt}>{x.t}</div>
-            <div style={st.tc}>{x.c}</div>
+            <div className={st.td}>{i + 1}</div>
+            <div className={st.tt}>{x.t}</div>
+            <div className={st.tc}>{x.c}</div>
           </motion.div>
         ))}
       </div>
     </motion.div>
-    <motion.div style={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
-      <h3 style={{ margin: "0 0 20px 0", fontSize: 20 }}>A Sé Apostólica de Antioquia</h3>
-      <p style={{ lineHeight: 1.8, marginBottom: 15 }}>
+    <motion.div className={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
+      <h3 className="m-[0 0 20px 0] text-[20]">A Sé Apostólica de Antioquia</h3>
+      <p className="leading-[1.8] mb-[15]">
         A <strong>Igreja Ortodoxa Grega de Antioquia</strong> é uma das <strong>quatro Igrejas Autocéfalas mais antigas</strong>.
       </p>
-      <ul style={{ paddingLeft: 25, lineHeight: 1.8 }}>
+      <ul className="pl-[25] leading-[1.8]">
         <li><strong>Fundação:</strong> Apóstolos Pedro e Paulo (Atos 11:26)</li>
         <li><strong>Primeiro Nome:</strong> "Cristãos" pela primeira vez</li>
         <li><strong>Sé Apostólica:</strong> Uma das três sedes petrinas</li>
         <li><strong>Atual Patriarca:</strong> Sua Beatitude João X</li>
       </ul>
-      <motion.div style={{ marginTop: 20, padding: 15, background: "var(--lit-bg)", borderRadius: 8, borderLeft: `4px solid var(--lit-gold)` }}>
-        <p style={{ margin: 0, color: "var(--lit-red)", fontStyle: "italic" }}>
+      <motion.div className="mt-[20] p-[15] bg-[color:var(--lit-bg)] rounded-[8] border-l-[4px solid var(--lit-gold)]">
+        <p className="m-0 text-[color:var(--lit-red)] italic">
           "Em Antioquia, os discípulos foram pela primeira vez chamados de cristãos."
         </p>
-        <footer style={{ fontStyle: "normal", marginTop: 10, fontSize: 12 }}>— Atos 11:26</footer>
+        <footer className="mt-[10] text-[12]">— Atos 11:26</footer>
       </motion.div>
     </motion.div>
-    <motion.div style={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}>
+    <motion.div className={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}>
       "A Igreja é apostólica porque é fundamentada nos Apóstolos."
       <br />
-      <footer style={{ fontStyle: "normal", marginTop: 10, fontSize: 14 }}>— Tradição Ortodoxa</footer>
+      <footer className="mt-[10] text-[14]">— Tradição Ortodoxa</footer>
     </motion.div>
   </div>
 );
 
 const Paroxia = () => (
-  <div style={st.sc}>
-    <motion.div style={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-      <h1 style={st.st}>
+  <div className={st.sc}>
+    <motion.div className={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+      <h1 className={st.st}>
         <IconMessageUser size={32} color="var(--lit-gold)" /> Vida na Paróquia
       </h1>
-      <p style={st.sst}>Comunidade São Jorge</p>
+      <p className={st.sst}>Comunidade São Jorge</p>
     </motion.div>
-    <motion.p style={{ fontSize: 18, lineHeight: 1.8, marginBottom: 30 }} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+    <motion.p className="text-[18] leading-[1.8] mb-[30]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
       A <strong>Paróquia São Jorge</strong> é sua <strong>família espiritual</strong>.
     </motion.p>
-    <motion.div style={st.card} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
-      <h3 style={{ margin: "0 0 20px 0", fontSize: 20 }}>Nossa Comunidade</h3>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 20 }}>
-        <div style={st.card}>
-          <h4 style={{ color: "var(--lit-red)", margin: "0 0 10px 0" }}>
+    <motion.div className={st.card} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+      <h3 className="m-[0 0 20px 0] text-[20]">Nossa Comunidade</h3>
+      <div className="grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-20">
+        <div className={st.card}>
+          <h4 className="text-[color:var(--lit-red)] m-[0 0 10px 0]">
             <strong>Pároco:</strong> Pe. Samaan
           </h4>
-          <p style={{ margin: 0 }}>Orientação espiritual da paróquia.</p>
+          <p className="m-0">Orientação espiritual da paróquia.</p>
         </div>
-        <div style={st.card}>
-          <h4 style={{ color: "var(--lit-red)", margin: "0 0 10px 0" }}>
+        <div className={st.card}>
+          <h4 className="text-[color:var(--lit-red)] m-[0 0 10px 0]">
             <strong>Catequista:</strong> Talles Diniz Tonatto
           </h4>
-          <p style={{ margin: 0 }}>Formação catecumenal.</p>
+          <p className="m-0">Formação catecumenal.</p>
         </div>
       </div>
     </motion.div>
-    <motion.div style={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
-      <h3 style={{ margin: "0 0 20px 0", fontSize: 20 }}>Ofícios Divinos</h3>
-      <p style={{ lineHeight: 1.8, marginBottom: 20 }}>
+    <motion.div className={st.hc} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
+      <h3 className="m-[0 0 20px 0] text-[20]">Ofícios Divinos</h3>
+      <p className="leading-[1.8] mb-[20]">
         Os <strong>Ofícios Divinos</strong> são o <strong>coração da vida paroquial</strong>.
       </p>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 15 }}>
+      <div className="grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-15">
         {[
           { t: "Vésperas", d: "Sábado à tarde", desc: "Preparação para o Domingo" },
           { t: "Divina Liturgia", d: "Domingo de manhã", desc: "Celebração central" },
           { t: "Encontros", d: "[Dia da semana]", desc: "Formação catecumenal" },
         ].map((x, i) => (
-          <div key={i} style={{ ...st.card, background: "linear-gradient(135deg, var(--lit-gold)10, var(--lit-red)05)" }}>
-            <h4 style={{ color: "var(--lit-red)", margin: "0 0 10px 0" }}>{x.t}</h4>
-            <p style={{ margin: "0 0 10px 0", fontSize: 14 }}>{x.d}</p>
-            <p style={{ margin: 0, fontSize: 14 }}>{x.desc}</p>
+          <div key={i} className={cx(st.card)}>
+            <h4 className="text-[color:var(--lit-red)] m-[0 0 10px 0]">{x.t}</h4>
+            <p className="m-[0 0 10px 0] text-[14]">{x.d}</p>
+            <p className="m-0 text-[14]">{x.desc}</p>
           </div>
         ))}
       </div>
       <motion.div
-        style={{
-          marginTop: 20,
-          padding: 10,
-          background: "var(--lit-bg)",
-          borderRadius: 6,
-          borderLeft: `3px solid var(--lit-gold)`,
-          fontSize: 14,
-          color: "var(--lit-red)",
-        }}
+        className="mt-[20] p-[10] bg-[color:var(--lit-bg)] rounded-[6] border-l-[3px solid var(--lit-gold)] text-[14] text-[color:var(--lit-red)]"
       >
         <strong>Dica:</strong> Tente participar de pelo menos um ofício por semana.
       </motion.div>
     </motion.div>
-    <motion.div style={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}>
+    <motion.div className={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}>
       "A paróquia é a família espiritual onde crescemos juntos."
       <br />
-      <footer style={{ fontStyle: "normal", marginTop: 10, fontSize: 14 }}>— Pe. Samaan</footer>
+      <footer className="mt-[10] text-[14]">— Pe. Samaan</footer>
     </motion.div>
   </div>
 );
@@ -984,18 +823,18 @@ const Leituras = () => {
   ];
   const current = cats.find((x) => x.i === cat)!;
   return (
-    <div style={st.sc}>
-      <motion.div style={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-        <h1 style={st.st}>
+    <div className={st.sc}>
+      <motion.div className={st.sh} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+        <h1 className={st.st}>
           <IconBook size={32} color="var(--lit-gold)" /> Leituras Recomendadas
         </h1>
-        <p style={st.sst}>Recursos para estudo e crescimento</p>
+        <p className={st.sst}>Recursos para estudo e crescimento</p>
       </motion.div>
-      <motion.p style={{ fontSize: 18, lineHeight: 1.8, marginBottom: 30 }} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+      <motion.p className="text-[18] leading-[1.8] mb-[30]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
         A leitura espiritual é <strong>alimento para a alma</strong>.
       </motion.p>
       <motion.div
-        style={{ display: "flex", gap: 10, marginBottom: 30, flexWrap: "wrap" }}
+        className="flex gap-10 mb-[30] flex-wrap"
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}
@@ -1003,21 +842,14 @@ const Leituras = () => {
         {cats.map((x, i) => (
           <motion.button
             key={x.i}
-            style={{
-              ...st.bt,
-              ...(cat === x.i ? st.bta : st.bts),
-              flex: "1 1 calc(33.333% - 10px)",
-              minWidth: 200,
-              justifyContent: "center",
-              padding: "15px 10px",
-            }}
+            className={cx(st.bt, "flex-[1_1_calc(33.333%_-_10px)] justify-center p-[15px 10px]")}
             onClick={() => setCat(x.i)}
             whileHover={{ opacity: 0.9, scale: 1.02 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 + i * 0.1 }}
           >
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+            <div className="flex flex-col items-center gap-8">
               {x.ic}
               <span>{x.t}</span>
             </div>
@@ -1027,30 +859,30 @@ const Leituras = () => {
       <AnimatePresence mode="wait">
         <motion.div
           key={current.i}
-          style={st.hc}
+          className={st.hc}
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -50 }}
           transition={{ duration: 0.3 }}
         >
-          <h3 style={{ margin: "0 0 15px 0", fontSize: 20, display: "flex", alignItems: "center", gap: 10 }}>
+          <h3 className="m-[0 0 15px 0] text-[20] flex items-center gap-10">
             {current.ic}
             {current.t}
           </h3>
-          <p style={{ lineHeight: 1.8, marginBottom: 20 }}>{current.d}</p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 15 }}>
+          <p className="leading-[1.8] mb-[20]">{current.d}</p>
+          <div className="grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-15">
             {current.items.map((y, j) => (
               <motion.div
                 key={j}
-                style={st.card}
+                className={st.card}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * j }}
               >
-                <h4 style={{ color: "var(--lit-red)", margin: "0 0 10px 0", fontSize: 16 }}>
+                <h4 className="text-[color:var(--lit-red)] m-[0 0 10px 0] text-[16]">
                   {(y as { a?: string; n?: string }).a || (y as { n?: string }).n}
                 </h4>
-                <p style={{ margin: "0 0 10px 0", fontSize: 14 }}>
+                <p className="m-[0 0 10px 0] text-[14]">
                   <strong>{(y as { w?: string }).w || "Recurso"}:</strong>{" "}
                   {(y as { th?: string }).th || (y as { t2?: string }).t2}
                 </p>
@@ -1059,10 +891,10 @@ const Leituras = () => {
           </div>
         </motion.div>
       </AnimatePresence>
-      <motion.div style={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }}>
+      <motion.div className={st.quote} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }}>
         "A leitura dos Santos Padres é como um banquete espiritual."
         <br />
-        <footer style={{ fontStyle: "normal", marginTop: 10, fontSize: 14 }}>— São João Clímaco</footer>
+        <footer className="mt-[10] text-[14]">— São João Clímaco</footer>
       </motion.div>
     </div>
   );
@@ -1174,19 +1006,11 @@ const GuiaCatecumenal = () => {
 
   return (
     <div
-      style={{
-        ...st.c,
-        ...(dark
-          ? {
-              background: "linear-gradient(135deg, var(--lit-dark) 0%, var(--lit-bg) 100%)",
-            }
-          : {}),
-      }}
+      className={cx(st.c)}
     >
       {/* Mobile overlay backdrop */}
       <div
-        className="md:hidden"
-        style={{ display: mobileMenuOpen ? "block" : "none" }}
+        className={cx("md:hidden", mobileMenuOpen ? "block" : "hidden")}
         onClick={() => setMobileMenuOpen(false)}
       />
 
@@ -1194,12 +1018,12 @@ const GuiaCatecumenal = () => {
       <div
         className="md:hidden fixed top-0 left-0 right-0 z-[90] bg-lit-dark text-white flex items-center justify-between px-4 py-3"
       >
-        <span style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 16, fontWeight: "bold" }}>
+        <span className="flex items-center gap-10 text-[16] font-bold">
           <IconBuildingChurch size={24} /> Guia Catecumenal
         </span>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          style={{ background: "transparent", border: "none", color: "white", cursor: "pointer" }}
+          className="bg-transparent text-white cursor-pointer"
         >
           {mobileMenuOpen ? <IconX size={24} /> : <IconMenu size={24} />}
         </button>
@@ -1207,54 +1031,26 @@ const GuiaCatecumenal = () => {
 
       {/* SIDEBAR (desktop fixed, mobile slide-in) */}
       <motion.div
-        style={{
-          ...st.sb,
-          ...(dark
-            ? {
-                background: "linear-gradient(180deg, var(--lit-dark) 0%, var(--lit-bg) 100%)",
-              }
-            : {
-                background: "linear-gradient(180deg, var(--lit-dark) 0%, var(--lit-red) 100%)",
-              }),
-          ...(mobileMenuOpen
-            ? { position: "fixed", transform: "translateX(0)" }
-            : {}),
-        }}
+        className={cx(st.sb, "md:relative md:translate-x-0")}
         initial={{ x: -300 }}
         animate={{ x: mobileMenuOpen ? 0 : -300 }}
         transition={{ duration: 0.5, type: "spring" }}
-        className="md:relative md:translate-x-0"
       >
         <motion.div
-          style={{
-            padding: "0 20px 20px",
-            textAlign: "center",
-            borderBottom: `1px solid var(--lit-gold)`,
-            marginBottom: 20,
-          }}
+          className="p-[0 20px 20px] text-center mb-[20]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
           <motion.div
-            style={{
-              width: 60,
-              height: 60,
-              background: "radial-gradient(circle, var(--lit-gold) 0%, var(--lit-red) 100%)",
-              borderRadius: "50%",
-              margin: "0 auto 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 4px 15px rgba(212,175,55,0.3)",
-            }}
+            className="w-[60] h-60 rounded-full m-[0 auto 15px] flex items-center justify-center shadow-[0_4px_15px_rgba(212_175_55_0.3)]"
             whileHover={{ scale: 1.1, rotate: [0, 10, -10, 0] }}
             transition={{ duration: 0.5 }}
           >
             <IconBuildingChurch size={32} color="white" />
           </motion.div>
-          <h2 style={{ margin: 0, fontSize: 18, color: "white" }}>Guia Catecumenal</h2>
-          <p style={{ margin: "5px 0 0 0", fontSize: 12, opacity: 0.8 }}>São Jorge</p>
+          <h2 className="m-0 text-[18] text-white">Guia Catecumenal</h2>
+          <p className="m-[5px 0 0 0] text-[12]">São Jorge</p>
         </motion.div>
         <nav>
           {S.map((s) => {
@@ -1263,10 +1059,7 @@ const GuiaCatecumenal = () => {
             return (
               <motion.div
                 key={s.i}
-                style={{
-                  ...st.ni,
-                  ...(isA ? st.nia : {}),
-                }}
+                className={cx(st.ni)}
                 onClick={() => {
                   setSec(s.i);
                   setMobileMenuOpen(false);
@@ -1276,11 +1069,11 @@ const GuiaCatecumenal = () => {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.1 * S.findIndex((x) => x.i === s.i) }}
               >
-                <span style={{ color: isA ? "var(--lit-bg)" : "white" }}>{s.ic}</span>
+                <span className={cx(isA ? "text-[color:var(--lit-bg)]" : "text-white")}>{s.ic}</span>
                 <span>{s.t}</span>
                 {isC ? (
                   <motion.span
-                    style={{ marginLeft: "auto", color: c.ok }}
+                    className="ml-auto"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                   >
@@ -1291,15 +1084,10 @@ const GuiaCatecumenal = () => {
             );
           })}
         </nav>
-        <div style={{ padding: 20, marginTop: 20 }}>
+        <div className="p-[20] mt-[20]">
           {sd?.q && (
             <motion.button
-              style={{
-                ...st.bt,
-                ...st.bta,
-                width: "100%",
-                justifyContent: "center",
-              }}
+              className={cx(st.bt, st.bta, "w-[100%] justify-center")}
               onClick={hStartQ}
               whileHover={{ opacity: 0.9, scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -1308,13 +1096,7 @@ const GuiaCatecumenal = () => {
             </motion.button>
           )}
           <motion.button
-            style={{
-              ...st.bt,
-              ...st.bts,
-              width: "100%",
-              justifyContent: "center",
-              marginTop: 10,
-            }}
+            className={cx(st.bt, st.bts, "w-[100%] justify-center")}
             onClick={toggleD}
             whileHover={{ opacity: 0.9, scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -1327,43 +1109,27 @@ const GuiaCatecumenal = () => {
 
       {/* HEADER (desktop fixed, mobile relative) */}
       <motion.div
-        style={{
-          ...st.h,
-          ...(dark
-            ? {
-                background: "linear-gradient(90deg, var(--lit-dark) 0%, var(--lit-bg) 100%)",
-              }
-            : {}),
-          ...(mobileMenuOpen
-            ? { position: "fixed", left: 280, top: 0 }
-            : {}),
-        }}
-        className="md:static md:translate-x-0"
+        className={cx(st.h, "md:static md:translate-x-0")}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div style={st.lg}>
+        <div className={st.lg}>
           <IconBuildingChurch size={28} />
           <span>Guia Catecumenal Interativo</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div style={st.pb}>
+        <div className="flex items-center gap-20">
+          <div className={st.pb}>
             <motion.div
-              style={st.pf}
+              className={st.pf}
               initial={{ width: 0 }}
               animate={{ width: `${pg}%` }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
             />
           </div>
-          <span style={{ fontSize: 14, color: "white" }}>{Math.round(pg)}% Concluído</span>
+          <span className="text-[14] text-white">{Math.round(pg)}% Concluído</span>
           <motion.button
-            style={{
-              ...st.bt,
-              background: "transparent",
-              border: `1px solid var(--lit-gold)`,
-              color: "var(--lit-gold)",
-            }}
+            className={cx(st.bt, "bg-transparent text-[color:var(--lit-gold)]")}
             onClick={goP}
             disabled={idx === 0}
             whileHover={{ opacity: 0.9, scale: 1.02 }}
@@ -1371,12 +1137,7 @@ const GuiaCatecumenal = () => {
             <IconChevronLeft size={18} />
           </motion.button>
           <motion.button
-            style={{
-              ...st.bt,
-              background: "transparent",
-              border: `1px solid var(--lit-gold)`,
-              color: "var(--lit-gold)",
-            }}
+            className={cx(st.bt, "bg-transparent text-[color:var(--lit-gold)]")}
             onClick={goN}
             disabled={idx === S.length - 1}
             whileHover={{ opacity: 0.9, scale: 1.02 }}
@@ -1388,8 +1149,7 @@ const GuiaCatecumenal = () => {
 
       {/* MAIN */}
       <main
-        className="md:ml-[280px] md:pt-[90px] pt-[60px] w-full"
-        style={{ ...st.m, ...(dark ? { color: "white" } : {}), marginLeft: 0, paddingLeft: 0 }}
+        className={cx(st.m, "md:ml-[280px] md:pt-[90px] pt-[60px] w-full", dark ? "text-white" : "")}
       >
         <AnimatePresence mode="wait">
           {sectionComponents[sec] ?? sectionComponents["bem-vindo"]}
@@ -1397,30 +1157,13 @@ const GuiaCatecumenal = () => {
 
         {/* NOTIFICATIONS */}
         <div
-          style={{
-            position: "fixed",
-            top: 100,
-            right: 40,
-            zIndex: 1001,
-            display: "flex",
-            flexDirection: "column",
-            gap: 10,
-          }}
+          className="fixed top-[100] right-[40] z-[1001] flex flex-col gap-10"
         >
           <AnimatePresence>
             {notif.map((n) => (
               <motion.div
                 key={n.id}
-                style={{
-                  padding: "12px 20px",
-                  borderRadius: 8,
-                  background: n.t === "ok" ? c.ok : n.t === "err" ? c.err : c.info,
-                  color: "white",
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                }}
+                className="p-[12px 20px] rounded-[8] text-white shadow-[0_4px_15px_rgba(0_0_0_0.2)] flex items-center gap-10"
                 initial={{ x: 400, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 400, opacity: 0 }}
@@ -1440,33 +1183,14 @@ const GuiaCatecumenal = () => {
           {showQ && curQ && (
             <motion.div
               key="quiz-modal"
-              style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: "rgba(0,0,0,0.7)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 1000,
-              }}
+              className="fixed top-[0] left-[0] right-[0] bottom-[0] flex items-center justify-center z-[1000]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowQ(false)}
             >
               <motion.div
-                style={{
-                  ...st.qc,
-                  ...(dark
-                    ? {
-                        background: "var(--lit-red)",
-                        color: "white",
-                      }
-                    : {}),
-                }}
+                className={cx(st.qc, "text-white", dark ? "bg-[color:var(--lit-red)] text-white" : "")}
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
@@ -1475,36 +1199,19 @@ const GuiaCatecumenal = () => {
                 {!qDone ? (
                   <>
                     <motion.div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: 20,
-                      }}
+                      className="flex justify-between items-center mb-[20]"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.2 }}
                     >
                       <h2
-                        style={{
-                          color: "var(--lit-gold)",
-                          margin: 0,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                        }}
+                        className="text-[color:var(--lit-gold)] m-0 flex items-center gap-10"
                       >
                         <IconInfoCircle size={24} color="var(--lit-gold)" />
                         {curQ.t}
                       </h2>
                       <motion.button
-                        style={{
-                          ...st.bt,
-                          background: "transparent",
-                          border: `1px solid var(--lit-gold)`,
-                          color: "var(--lit-gold)",
-                          padding: "8px 12px",
-                        }}
+                        className={cx(st.bt, "bg-transparent text-[color:var(--lit-gold)] p-[8px 12px]")}
                         onClick={() => setShowQ(false)}
                         whileHover={{ opacity: 0.9, scale: 1.02 }}
                       >
@@ -1512,48 +1219,29 @@ const GuiaCatecumenal = () => {
                       </motion.button>
                     </motion.div>
                     <p
-                      style={{
-                        color: "var(--lit-text-secondary)",
-                        marginBottom: 20,
-                      }}
+                      className="text-[color:var(--lit-text-secondary)] mb-[20]"
                     >
                       {curQ.d}
                     </p>
                     <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: 20,
-                        padding: "10px 15px",
-                        background: "var(--lit-bg)",
-                        borderRadius: 8,
-                      }}
+                      className="flex justify-between items-center mb-[20] p-[10px 15px] bg-[color:var(--lit-bg)] rounded-[8]"
                     >
-                      <span style={{ color: "var(--lit-red)", fontWeight: "bold" }}>
+                      <span className="text-[color:var(--lit-red)] font-bold">
                         Questão {qIdx + 1} de {curQ.q.length}
                       </span>
-                      <span style={{ color: "var(--lit-gold)", fontWeight: "bold" }}>
+                      <span className="text-[color:var(--lit-gold)] font-bold">
                         Pontuação: {score}/{curQ.q.length}
                       </span>
                     </div>
                     <motion.p
-                      style={{
-                        fontSize: 18,
-                        fontWeight: "bold",
-                        color: "var(--lit-gold)",
-                        marginBottom: 20,
-                        padding: 15,
-                        background: "var(--lit-bg)",
-                        borderRadius: 8,
-                      }}
+                      className="text-[18] font-bold text-[color:var(--lit-gold)] mb-[20] p-[15] bg-[color:var(--lit-bg)] rounded-[8]"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
                     >
                       {curQ.q[qIdx].q}
                     </motion.p>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div className="flex flex-col gap-10">
                       {curQ.q[qIdx].o.map((o, i) => {
                         const isS = selA === i;
                         const isCorrect = i === curQ.q[qIdx].ca;
@@ -1561,21 +1249,12 @@ const GuiaCatecumenal = () => {
                         return (
                           <motion.button
                             key={i}
-                            style={{
-                              ...st.bt,
-                              textAlign: "left",
-                              justifyContent: "flex-start",
-                              ...(isS
-                                ? isCorrect
-                                  ? { background: c.ok, color: "white" }
-                                  : { background: c.err, color: "white" }
-                                : {}),
-                            }}
+                            className={cx(st.bt, "text-left justify-start")}
                             onClick={() => hAnswer(i)}
                             whileHover={{ scale: 1.02 }}
                             disabled={selA !== null}
                           >
-                            <span style={{ marginRight: 10, fontWeight: "bold" }}>
+                            <span className="mr-[10] font-bold">
                               {String.fromCharCode(65 + i)}.
                             </span>
                             {o}
@@ -1583,7 +1262,7 @@ const GuiaCatecumenal = () => {
                               <motion.span
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                style={{ marginLeft: "auto" }}
+                                className="ml-auto"
                               >
                                 <IconCheck size={20} />
                               </motion.span>
@@ -1592,7 +1271,7 @@ const GuiaCatecumenal = () => {
                               <motion.span
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                style={{ marginLeft: "auto" }}
+                                className="ml-auto"
                               >
                                 <IconBan size={20} />
                               </motion.span>
@@ -1603,28 +1282,20 @@ const GuiaCatecumenal = () => {
                     </div>
                     {showFb && (
                       <motion.div
-                        style={{
-                          marginTop: 20,
-                          padding: 15,
-                          ...(selA === curQ.q[qIdx].ca
-                            ? { background: c.ok + "20" }
-                            : { background: c.err + "20" }),
-                          borderRadius: 8,
-                          borderLeft: `4px solid ${selA === curQ.q[qIdx].ca ? c.ok : c.err}`,
-                        }}
+                        className="border-lit-border"
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         transition={{ duration: 0.3 }}
                       >
-                        <p style={{ margin: 0, fontStyle: "italic" }}>
+                        <p className="m-0 italic">
                           <strong>Explicação:</strong> {curQ.q[qIdx].e}
                         </p>
                       </motion.div>
                     )}
-                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 30 }}>
+                    <div className="flex justify-end gap-10 mt-[30]">
                       {qIdx > 0 && (
                         <motion.button
-                          style={{ ...st.bt, ...st.bts }}
+                          className={cx(st.bt, st.bts)}
                           onClick={() => {
                             setQIdx(qIdx - 1);
                             setSelA(null);
@@ -1635,7 +1306,7 @@ const GuiaCatecumenal = () => {
                           <IconChevronLeft size={18} /> Voltar
                         </motion.button>
                       )}
-                      <motion.button style={{ ...st.bt, ...st.bta }} onClick={hNext} whileHover={{ opacity: 0.9, scale: 1.02 }}>
+                      <motion.button className={cx(st.bt, st.bta)} onClick={hNext} whileHover={{ opacity: 0.9, scale: 1.02 }}>
                         {qIdx < curQ.q.length - 1 ? "Próxima" : "Finalizar"}
                         <IconChevronRight size={18} />
                       </motion.button>
@@ -1643,68 +1314,41 @@ const GuiaCatecumenal = () => {
                   </>
                 ) : (
                   <motion.div
-                    style={{ textAlign: "center", padding: "40px 20px" }}
+                    className="text-center p-[40px 20px]"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.2 }}
                   >
                     <motion.div
-                      style={{
-                        width: 100,
-                        height: 100,
-                        background: "radial-gradient(circle, var(--lit-gold) 0%, var(--lit-red) 100%)",
-                        borderRadius: "50%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        margin: "0 auto 20px",
-                        boxShadow: "0 4px 20px rgba(212,175,55,0.3)",
-                      }}
+                      className="w-[100] h-100 rounded-full flex items-center justify-center m-[0 auto 20px] shadow-[0_4px_20px_rgba(212_175_55_0.3)]"
                       animate={{ rotate: [0, 10, -10, 0] }}
                       transition={{ duration: 0.5, repeat: 9999 }}
                     >
                       <IconAward size={48} color="var(--lit-bg)" />
                     </motion.div>
-                    <h2 style={{ color: "var(--lit-gold)", margin: "0 0 10px 0", fontSize: 28 }}>Quiz Concluído!</h2>
-                    <p style={{ fontSize: 18, margin: "0 0 20px 0" }}>
+                    <h2 className="text-[color:var(--lit-gold)] m-[0 0 10px 0] text-[28]">Quiz Concluído!</h2>
+                    <p className="text-[18] m-[0 0 20px 0]">
                       Sua pontuação: {score}/{curQ.q.length} ({Math.round((score / curQ.q.length) * 100)}%)
                     </p>
                     <motion.div
-                      style={{
-                        width: "100%",
-                        height: 8,
-                        background: "var(--lit-bg)",
-                        borderRadius: 4,
-                        margin: "20px 0",
-                        overflow: "hidden",
-                      }}
+                      className="w-[100%] h-8 bg-[color:var(--lit-bg)] rounded-[4] m-[20px 0] overflow-hidden"
                     >
                       <motion.div
-                        style={{
-                          height: "100%",
-                          background: "linear-gradient(90deg, var(--lit-gold), var(--lit-red))",
-                          borderRadius: 4,
-                        }}
+                        className="h-[100%] rounded-[4]"
                         initial={{ width: 0 }}
                         animate={{ width: `${(score / curQ.q.length) * 100}%` }}
                         transition={{ duration: 1, ease: "easeInOut" }}
                       />
                     </motion.div>
                     <motion.button
-                      style={{ ...st.bt, ...st.bta, padding: "12px 30px" }}
+                      className={cx(st.bt, st.bta, "p-[12px 30px]")}
                       onClick={hRestart}
                       whileHover={{ opacity: 0.9, scale: 1.02 }}
                     >
                       Reiniciar Quiz
                     </motion.button>
                     <motion.button
-                      style={{
-                        ...st.bt,
-                        background: "transparent",
-                        border: `1px solid var(--lit-gold)`,
-                        color: "var(--lit-gold)",
-                        marginLeft: 10,
-                      }}
+                      className={cx(st.bt, "bg-transparent text-[color:var(--lit-gold)]")}
                       onClick={() => setShowQ(false)}
                       whileHover={{ opacity: 0.9, scale: 1.02 }}
                     >
@@ -1719,10 +1363,7 @@ const GuiaCatecumenal = () => {
 
         {/* FOOTER */}
         <motion.div
-          style={{
-            ...st.f,
-            color: dark ? "rgba(255,255,255,0.8)" : "var(--lit-text-secondary)",
-          }}
+          className={cx(st.f)}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -1735,7 +1376,7 @@ const GuiaCatecumenal = () => {
             Versão 1.0 — Setembro 2026
           </p>
           <motion.p
-            style={{ marginTop: 10, fontSize: 12, color: dark ? "rgba(255,255,255,0.8)" : "var(--lit-text-secondary)" }}
+            className=""
             whileHover={{ scale: 1.05 }}
           >
             Que Deus abençoe sua jornada espiritual!
