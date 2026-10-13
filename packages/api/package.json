@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
+    "deploy:production": "node ../../scripts/check-production-config.mjs && wrangler deploy",
     "deploy:staged": "wrangler deploy --env staging",
     "test": "vitest run",
     "db:local": "wrangler d1 execute sao-jorge-db --local --file=./migrations/001_schema.sql && wrangler d1 execute sao-jorge-db --local --file=./migrations/002_seed.sql",
