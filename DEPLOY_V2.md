@@ -2,14 +2,19 @@
 
 ## Cloudflare Access
 
-1. Create an Access application for the public web origin and protect `/admin/*`.
-2. Protect the API origin’s `/api/admin/*` paths with the same Access policy.
+1. Create an Access application for the web origin and protect `/admin/*` when the web deployment has been selected.
+2. Protect the API origin’s `/api/admin/*` paths. A `workers.dev` hostname is valid; a custom domain is not required.
 3. Set `ACCESS_TEAM_DOMAIN` to the team domain without `https://`.
 4. Set `ACCESS_AUDIENCE` to the Access application audience tag.
-5. Add the `parish-admin` role to the administrator policy and set `ACCESS_ADMIN_ROLE` accordingly.
-6. Verify that the Worker receives `Cf-Access-Jwt-Assertion`; the Worker independently verifies its signature, issuer, audience, expiry, and administrator role.
+5. Add the administrator email to the Worker environment allowlist, or add the `parish-admin` role when the selected identity provider emits roles.
+6. Verify that the Worker receives `Cf-Access-Jwt-Assertion`; the Worker independently verifies its signature, issuer, audience, expiry, and administrator identity.
 
 The old `ADMIN_TOKEN` flow is not supported by v2 and must not be configured.
+
+For the current staging setup, the protected path is:
+`sao-jorge-api-staging.talles-f1e.workers.dev/api/admin/*`.
+Production must use its own Access application audience (or an explicitly
+expanded application) before the production Worker is deployed.
 
 ## Environments
 

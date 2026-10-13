@@ -1,0 +1,35 @@
+name: Validate São Jorge v2
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install reproducibly
+        run: npm ci
+
+      - name: Type-check all packages
+        run: npm run type-check
+
+      - name: Test API
+        run: npm test --workspace=@sao-jorge/api
+
+      - name: Lint web
+        run: npm run lint --workspace=@sao-jorge/web
+
+      - name: Build web
+        run: npm run build:web
+
+      - name: Validate Worker dry-run
+        run: npx wrangler deploy --dry-run --env staging
