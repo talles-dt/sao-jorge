@@ -7,17 +7,20 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "deploy:staged": "wrangler deploy --env staging",
+    "test": "vitest run",
     "db:local": "wrangler d1 execute sao-jorge-db --local --file=./migrations/001_schema.sql && wrangler d1 execute sao-jorge-db --local --file=./migrations/002_seed.sql",
-    "db:migrate": "wrangler d1 execute sao-jorge-db --file=./migrations/001_schema.sql && wrangler d1 execute sao-jorge-db --file=./migrations/002_seed.sql",
+    "db:migrate": "wrangler d1 execute sao-jorge-db --file=./migrations/001_schema.sql && wrangler d1 execute sao-jorge-db --file=./migrations/002_seed.sql && wrangler d1 execute sao-jorge-db --file=./migrations/003_add_category.sql && wrangler d1 execute sao-jorge-db --file=./migrations/004_catequese_adultos_restructure.sql && wrangler d1 execute sao-jorge-db --file=./migrations/005_catechesis_privacy.sql && wrangler d1 execute sao-jorge-db --file=./migrations/006_signup_rate_limits.sql && wrangler d1 execute sao-jorge-db --file=./migrations/007_admin_audit_events.sql",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@sao-jorge/shared": "file:../shared",
-    "@zernio/node": "^0.2.419"
+    "@zernio/node": "^0.2.419",
+    "jose": "^6.0.10"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250321.0",
     "typescript": "^5.4.5",
     "wrangler": "^4.96.0"
+    ,"vitest": "^3.2.4"
   }
 }

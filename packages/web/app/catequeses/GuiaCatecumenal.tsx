@@ -23,7 +23,7 @@ import {
   IconSunCloud,
   IconGift,
   IconCrosshairs2,
-} from "nucleo-sharp";
+} from "@/components/ParishIcons";
 import { BemVindo, Fundamentos, Sacramentos, Espiritualidade, Liturgia, Historia, Paroxia, Leituras } from "./SecoesCatecumenal";
 
 // ===== QUIZZES =====

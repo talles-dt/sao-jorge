@@ -18,7 +18,7 @@ type LitDayForm = {
 
 export default function AdminLiturgicalPage() {
   const [form, setForm] = useState<LitDayForm>({
-    date: new Date().toISOString().split("T")[0],
+    date: new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date()),
     tone_of_week: 1,
     fast_type: "none",
     feast_level: 0,
@@ -33,16 +33,16 @@ export default function AdminLiturgicalPage() {
     e.preventDefault();
     const res = await fetch(`${API_URL}/api/admin/liturgical`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("adminToken") ?? ""}`,
       },
       body: JSON.stringify(form),
     });
     if (!res.ok) {
       alert(`Erro: ${await res.text()}`);
     } else {
-      alert("Salvo com sucesso!");
+      alert("Salvo com sucesso! O cache foi atualizado.");
     }
   }
 

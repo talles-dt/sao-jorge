@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import CelebrationModeToggle from "./CelebrationToggle";
+import MarkdownBody from "@/components/MarkdownBody";
 import type { ServiceSection } from "./page";
 /* ── Speaker detection & colors ──────────────────────────────────────────── */
 
@@ -52,10 +53,7 @@ function RubricSection({ section, celebration }: { section: ServiceSection; cele
   if (celebration) return null; // Hide rubrics in celebration mode
   return (
     <div className="py-3 pl-4 border-l-2 border-lit-rubric/40">
-      <p
-        className="text-lit-rubric italic font-ui text-sm leading-relaxed"
-        dangerouslySetInnerHTML={{ __html: inlineMarkdown(section.textPt ?? "") }}
-      />
+      <div className="text-lit-rubric italic font-ui text-sm leading-relaxed"><MarkdownBody body={section.textPt ?? ""} /></div>
     </div>
   );
 }
@@ -115,12 +113,10 @@ function VerseSection({ section, celebration }: { section: ServiceSection; celeb
               [{section.verseNumber}]
             </span>
           )}
-          <span
-            className={`font-display leading-relaxed ${
+          <div className={`font-display leading-relaxed ${
               celebration ? "text-xl md:text-2xl leading-loose" : "text-base leading-relaxed"
             }`}
-            dangerouslySetInnerHTML={{ __html: inlineMarkdown((body || section.textPt) ?? "") }}
-          />
+          ><MarkdownBody body={(body || section.textPt) ?? ""} /></div>
         </div>
 
         {/* Arabic */}
@@ -130,20 +126,16 @@ function VerseSection({ section, celebration }: { section: ServiceSection; celeb
               celebration ? "text-2xl md:text-3xl leading-[2.2]" : "text-xl"
             }`}
             style={{ fontFamily: "var(--font-arabic)", direction: "rtl" }}
-            dangerouslySetInnerHTML={{
-              __html: inlineMarkdown(speakerAr ? `**${speakerAr}:** ${bodyAr}` : section.textAr),
-            }}
-          />
+          ><MarkdownBody body={speakerAr ? `**${speakerAr}:** ${bodyAr}` : section.textAr} /></div>
         )}
 
         {/* Transliteration */}
         {section.textArTransliterated && (
-          <p
+          <div
             className={`italic font-ui leading-relaxed text-stone-500 min-w-0 ${
               celebration ? "text-base md:text-lg text-stone-400" : "text-sm"
             }`}
-            dangerouslySetInnerHTML={{ __html: inlineMarkdown(section.textArTransliterated) }}
-          />
+          ><MarkdownBody body={section.textArTransliterated} /></div>
         )}
       </div>
     </div>
@@ -154,10 +146,7 @@ function NoteSection({ section, celebration }: { section: ServiceSection; celebr
   if (celebration) return null;
   return (
     <div className="py-3 pl-4 border-l-2 border-stone-600/40">
-      <p
-        className="text-sm text-stone-500 italic font-ui"
-        dangerouslySetInnerHTML={{ __html: "Nota: " + inlineMarkdown(section.textPt ?? "") }}
-      />
+      <div className="text-sm text-stone-500 italic font-ui"><span>Nota: </span><MarkdownBody body={section.textPt ?? ""} /></div>
     </div>
   );
 }

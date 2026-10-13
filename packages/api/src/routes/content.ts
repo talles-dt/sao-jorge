@@ -2,6 +2,28 @@
 
 import type { Env } from "../lib/types";
 import { jsonResponse } from "../lib/types";
+import { normalizeLimit } from "../lib/validation";
+
+async function consumeSignupRateLimit(env: Env, key: string, max: number): Promise<boolean> {
+  const windowStart = new Date().toISOString().slice(0, 13);
+  const result = await env.DB.prepare(`
+    INSERT INTO signup_rate_limits (rate_key, window_start, request_count)
+    VALUES (?, ?, 1)
+    ON CONFLICT(rate_key) DO UPDATE SET
+      window_start = excluded.window_start,
+      request_count = CASE
+        WHEN signup_rate_limits.window_start <> excluded.window_start THEN 1
+        ELSE signup_rate_limits.request_count + 1
+      END
+    WHERE signup_rate_limits.window_start <> excluded.window_start
+       OR signup_rate_limits.request_count < ?
+  `).bind(key, windowStart, max).run();
+  return (result.meta?.changes ?? 0) > 0;
+}
+
+async function releaseSignupRateLimit(env: Env, key: string): Promise<void> {
+  await env.DB.prepare(`UPDATE signup_rate_limits SET request_count = MAX(request_count - 1, 0) WHERE rate_key = ?`).bind(key).run();
+}
 
 export async function handleContentRoutes(
   path: string,
@@ -32,7 +54,7 @@ export async function handleContentRoutes(
 
   // Blog list
   if (path === "/api/blog" && request.method === "GET") {
-    const limit = parseInt(url.searchParams.get("limit") ?? "10");
+    const limit = normalizeLimit(url.searchParams.get("limit"), 10);
     const rows = await env.DB.prepare(
       `SELECT slug, title, excerpt, author, category, tags, published_at, created_at FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC LIMIT ?`,
     )
@@ -55,7 +77,7 @@ export async function handleContentRoutes(
 
   // Bulletins
   if (path === "/api/bulletin" && request.method === "GET") {
-    const limit = parseInt(url.searchParams.get("limit") ?? "20");
+    const limit = normalizeLimit(url.searchParams.get("limit"), 20);
     const today = new Date().toLocaleDateString("en-CA", {
       timeZone: "America/Sao_Paulo",
     });
@@ -111,7 +133,7 @@ export async function handleContentRoutes(
 
     const unitSlug = String(body.unit_slug ?? "").trim();
     const fullName = String(body.full_name ?? "").trim();
-    const email = String(body.email ?? "").trim();
+    const email = String(body.email ?? "").trim().toLowerCase();
     const agreedToTerms = body.agreed_to_terms === true;
 
     if (!unitSlug || !fullName || !email) {
@@ -131,41 +153,34 @@ export async function handleContentRoutes(
       return jsonResponse({ error: "E-mail inválido." }, 400);
     }
 
-    // Rate limiting: max 3 signups per IP per hour
+    const unit = await env.DB.prepare(
+      `SELECT slug FROM catechesis_units WHERE slug = ?`,
+    ).bind(unitSlug).first();
+    if (!unit) return jsonResponse({ error: "Unidade não encontrada." }, 404);
+
+    // Atomic D1 rate limiting: max 3 signups per IP per hour.
     const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
-    const rateKey = `signup_limit:${ip}`;
-    const currentCount = parseInt((await env.DAY_CACHE.get(rateKey)) ?? "0");
-    if (currentCount >= 3) {
+    const ipKey = `ip:${ip}`;
+    if (!(await consumeSignupRateLimit(env, ipKey, 3))) {
       return jsonResponse(
         { error: "Limite de inscrições por hora atingido. Tente novamente mais tarde." },
         429,
       );
     }
-    await env.DAY_CACHE.put(rateKey, String(currentCount + 1), {
-      expirationTtl: 3600,
-    });
-
-    // Also rate-limit per email to prevent abuse
-    const emailKey = `signup_email:${email}`;
-    const existingSignup = await env.DAY_CACHE.get(emailKey);
-    if (existingSignup) {
+    const emailKey = `email:${email}`;
+    const recentEmail = await env.DB.prepare(`SELECT id FROM catechesis_signups WHERE email = ? AND deleted_at IS NULL AND created_at >= datetime('now', '-1 day') LIMIT 1`).bind(email).first();
+    if (recentEmail || !(await consumeSignupRateLimit(env, emailKey, 1))) {
+      await releaseSignupRateLimit(env, ipKey);
       return jsonResponse(
         { error: "Este e-mail já foi inscrito recentemente." },
         409,
       );
     }
-    await env.DAY_CACHE.put(emailKey, "1", { expirationTtl: 86400 });
-
-    const unit = await env.DB.prepare(
-      `SELECT slug FROM catechesis_units WHERE slug = ?`,
-    )
-      .bind(unitSlug)
-      .first();
-    if (!unit) return jsonResponse({ error: "Unidade não encontrada." }, 404);
-
-    await env.DB.prepare(
-      `INSERT INTO catechesis_signups (unit_slug, full_name, email, phone, birth_date, previous_religion, motivation, agreed_to_terms)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    const retentionUntil = new Date(Date.now() + 365 * 86400000).toISOString();
+    try {
+      await env.DB.prepare(
+      `INSERT INTO catechesis_signups (unit_slug, full_name, email, phone, birth_date, previous_religion, motivation, agreed_to_terms, consent_version, consented_at, privacy_policy_version, retention_until)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
       .bind(
         unitSlug,
@@ -175,9 +190,14 @@ export async function handleContentRoutes(
         body.birth_date ? String(body.birth_date) : null,
         body.previous_religion ? String(body.previous_religion) : null,
         body.motivation ? String(body.motivation) : null,
-        1,
-      )
-      .run();
+        1, "2026-10-13", new Date().toISOString(), "2026-10-13", retentionUntil,
+      ).run();
+    } catch (error) {
+      await releaseSignupRateLimit(env, ipKey);
+      await releaseSignupRateLimit(env, emailKey);
+      console.error("[signup] persistence failed", error instanceof Error ? error.message : "unknown error");
+      return jsonResponse({ error: "Não foi possível concluir a inscrição." }, 500);
+    }
 
     return jsonResponse({ ok: true });
   }

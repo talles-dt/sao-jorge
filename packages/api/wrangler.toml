@@ -6,6 +6,9 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 ENVIRONMENT = "production"
 TZ = "America/Sao_Paulo"
+ACCESS_TEAM_DOMAIN = "YOUR-TEAM.cloudflareaccess.com"
+ACCESS_AUDIENCE = "SET_IN_ENVIRONMENT"
+ACCESS_ADMIN_ROLE = "parish-admin"
 
 # ── D1 Database ────────────────────────────────────────────────────────────────
 [[d1_databases]]
@@ -33,16 +36,52 @@ crons = ["0 3 * * *"]
 binding = "AI"
 
 # ── Secrets (set via: wrangler secret put SECRET_NAME) ───────────────────────
-# ADMIN_TOKEN — Bearer token for /api/admin/* routes
+# Access JWT validation uses ACCESS_TEAM_DOMAIN and ACCESS_AUDIENCE above.
 # RESEND_KEY  — Resend API key for email notifications (optional)
 # ADMIN_EMAIL — Timon's email for review notifications
 
-# ── Dev environment ────────────────────────────────────────────────────────────
+# ── Staging environment ───────────────────────────────────────────────────────
+# Keep staging resources separate from production. Replace the placeholders
+# before applying this environment; never point staging at the production D1/KV.
+[env.staging]
+name = "sao-jorge-api-staging"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+TZ = "America/Sao_Paulo"
+ACCESS_TEAM_DOMAIN = "YOUR-TEAM.cloudflareaccess.com"
+ACCESS_AUDIENCE = "SET_STAGING_ACCESS_AUDIENCE"
+ACCESS_ADMIN_ROLE = "parish-admin"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "sao-jorge-db-staging"
+database_id = "7eaa48d0-d656-45c0-bb53-3b0b3614e373"
+
+[[env.staging.kv_namespaces]]
+binding = "DAY_CACHE"
+id = "f150e61742e84400b59f58a09407d652"
+preview_id = "e6de79a85a5d4143a9af7a3b031fd4d4"
+
+[[env.staging.r2_buckets]]
+binding = "MEDIA"
+bucket_name = "sao-jorge-media-staging"
+
+[env.staging.triggers]
+crons = []
+
+[env.staging.ai]
+binding = "AI"
+
+# ── Local development environment ─────────────────────────────────────────────
 [env.dev]
 name = "sao-jorge-api-dev"
 
 [env.dev.vars]
 ENVIRONMENT = "development"
+ACCESS_TEAM_DOMAIN = "YOUR-TEAM.cloudflareaccess.com"
+ACCESS_AUDIENCE = "SET_IN_ENVIRONMENT"
+ACCESS_ADMIN_ROLE = "parish-admin"
 
 # [[env.dev.d1_databases]]
 # binding = "DB"

@@ -1,9 +1,15 @@
 // ☩ São Jorge V2 — Admin routes
 
 import type { Env } from "../lib/types";
-import { jsonResponse, checkAdminAuth } from "../lib/types";
+import { jsonResponse, checkAdminAuth, todayBrasilia } from "../lib/types";
 import { runScraper } from "../lib/scraper";
+import { boundedText, isIsoDate, isOneOf } from "../lib/validation";
 import { getZernioClient, listZernioAccounts, createZernioPost, listZernioPosts, getZernioAnalytics, listZernioInboxConversations, sendZernioMessage } from "@sao-jorge/shared/zernio";
+
+async function audit(env: Env, actor: { sub: string; email?: string }, action: string, resourceType: string, resourceId?: string, metadata?: Record<string, unknown>) {
+  await env.DB.prepare(`INSERT INTO admin_audit_events (actor_subject, actor_email, action, resource_type, resource_id, metadata) VALUES (?, ?, ?, ?, ?, ?)`)
+    .bind(actor.sub, actor.email ?? null, action, resourceType, resourceId ?? null, metadata ? JSON.stringify(metadata) : null).run();
+}
 
 export async function handleAdminRoutes(
   path: string,
@@ -12,22 +18,46 @@ export async function handleAdminRoutes(
 ): Promise<Response | null> {
   if (!path.startsWith("/api/admin/")) return null;
 
-  const auth = checkAdminAuth(request, env);
-  if (!auth.ok) {
-    return jsonResponse({ error: "Unauthorized" }, 401);
+  const auth = await checkAdminAuth(request, env);
+  if (!auth) {
+    return jsonResponse({ error: "Unauthorized" }, 401, request);
+  }
+  if (auth === "forbidden") {
+    return jsonResponse({ error: "Forbidden" }, 403, request);
+  }
+
+  if (path === "/api/admin/catechesis-signups" && request.method === "GET") {
+    const rows = await env.DB.prepare(`SELECT id, unit_slug, full_name, email, phone, birth_date, previous_religion, motivation, consent_version, consented_at, privacy_policy_version, retention_until, created_at FROM catechesis_signups WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT 100`).all();
+    await audit(env, auth, "read", "catechesis_signup");
+    return jsonResponse({ data: rows.results, accessed_by: auth.email ?? auth.sub }, 200, request);
+  }
+
+  if (path === "/api/admin/catechesis-signups/delete" && request.method === "POST") {
+    const body = (await request.json()) as { id?: number };
+    if (!Number.isInteger(body.id)) return jsonResponse({ error: "id required" }, 400, request);
+    await env.DB.prepare(`UPDATE catechesis_signups SET deleted_at = ? WHERE id = ?`).bind(new Date().toISOString(), body.id).run();
+    await audit(env, auth, "delete", "catechesis_signup", String(body.id));
+    return jsonResponse({ ok: true, deleted_by: auth.email ?? auth.sub }, 200, request);
   }
 
   // Admin: manual liturgical day override
   if (path === "/api/admin/liturgical" && request.method === "POST") {
     const body = (await request.json()) as Record<string, unknown>;
     const { date, ...data } = body;
+    const validDate = typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date);
+    const tone = Number(data.tone_of_week ?? 1);
+    const feastLevel = Number(data.feast_level ?? 0);
+    const fastTypes = new Set(["none", "strict", "fish", "wine-oil", "xerophagy"]);
+    if (!validDate || !Number.isInteger(tone) || tone < 1 || tone > 8 || !Number.isInteger(feastLevel) || feastLevel < 0 || feastLevel > 6 || !fastTypes.has(String(data.fast_type ?? "none"))) {
+      return jsonResponse({ error: "Invalid liturgical day payload" }, 400, request);
+    }
     await env.DB.prepare(
       `INSERT OR REPLACE INTO liturgical_days (date, tone_of_week, fast_type, feast_level, feast_name_pt, feast_name_ar, epistle_ref, gospel_ref, source, status, scraped_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     ).bind(
       date,
-      data.tone_of_week ?? 1,
+      tone,
       data.fast_type ?? "none",
-      data.feast_level ?? 0,
+      feastLevel,
       data.feast_name_pt,
       data.feast_name_ar,
       data.epistle_ref,
@@ -36,12 +66,18 @@ export async function handleAdminRoutes(
       data.status ?? "approved",
       new Date().toISOString(),
     ).run();
-    return jsonResponse({ ok: true });
+    await env.DAY_CACHE.delete(`day:${String(date)}`);
+    if (String(date) === todayBrasilia()) await env.DAY_CACHE.delete(`day:${String(date)}`);
+    const updated = await env.DB.prepare(`SELECT * FROM liturgical_days WHERE date = ?`).bind(date).first();
+    return jsonResponse({ ok: true, data: updated, cache_status: "purged", updated_by: auth.email ?? auth.sub }, 200, request);
   }
 
   // Admin: blog post create/update
   if (path === "/api/admin/blog" && request.method === "POST") {
     const body = (await request.json()) as Record<string, unknown>;
+    if (!boundedText(body.slug, 160) || !boundedText(body.title, 240) || !boundedText(body.excerpt, 1000) || !boundedText(body.body, 200000) || !boundedText(body.author, 160) || !boundedText(body.category, 40) || (body.status !== undefined && !isOneOf(body.status, ["draft", "published"] as const)) || (body.tags !== undefined && !Array.isArray(body.tags))) {
+      return jsonResponse({ error: "Invalid blog payload" }, 400, request);
+    }
     const now = new Date().toISOString();
     await env.DB.prepare(
       `INSERT OR REPLACE INTO blog_posts (slug, title, excerpt, body, author, category, tags, status, published_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -63,6 +99,9 @@ export async function handleAdminRoutes(
   // Admin: bulletin create/update
   if (path === "/api/admin/bulletin" && request.method === "POST") {
     const body = (await request.json()) as Record<string, unknown>;
+    if (!boundedText(body.title, 240) || !boundedText(body.body, 200000) || !isOneOf(body.category, ["announcement", "event", "pastoral"] as const) || !isIsoDate(body.publish_date) || (body.expires_date !== undefined && body.expires_date !== null && !isIsoDate(body.expires_date)) || (body.status !== undefined && !isOneOf(body.status, ["pending", "published"] as const))) {
+      return jsonResponse({ error: "Invalid bulletin payload" }, 400, request);
+    }
     await env.DB.prepare(
       `INSERT OR REPLACE INTO bulletins (title, body, category, publish_date, expires_date, status) VALUES (?, ?, ?, ?, ?, ?)`,
     ).bind(
@@ -97,6 +136,9 @@ export async function handleAdminRoutes(
   // Admin: service-texts create
   if (path === "/api/admin/service-texts" && request.method === "POST") {
     const body = (await request.json()) as Record<string, unknown>;
+    if (!boundedText(body.slug, 160) || !boundedText(body.title_pt, 240) || !boundedText(body.category, 60) || (body.status !== undefined && !isOneOf(body.status, ["pending", "approved", "published"] as const)) || (body.sections !== undefined && typeof body.sections !== "string" && !Array.isArray(body.sections))) {
+      return jsonResponse({ error: "Invalid service-text payload" }, 400, request);
+    }
     const now = new Date().toISOString();
     const sections =
       typeof body.sections === "string"
@@ -123,7 +165,7 @@ export async function handleAdminRoutes(
       body.source_booklet_pages ?? null,
       now,
       body.status === "published" ? now : null,
-      body.status === "published" ? "admin" : null,
+      body.status === "published" ? auth.sub : null,
     ).run();
     return jsonResponse({ ok: true, version });
   }
@@ -131,6 +173,9 @@ export async function handleAdminRoutes(
   // Admin: service-texts update
   if (path === "/api/admin/service-texts" && request.method === "PUT") {
     const body = (await request.json()) as Record<string, unknown>;
+    if (!Number.isInteger(body.id) || !boundedText(body.title_pt, 240) || !boundedText(body.category, 60) || (body.status !== undefined && !isOneOf(body.status, ["pending", "approved", "published"] as const)) || (body.sections !== undefined && typeof body.sections !== "string" && !Array.isArray(body.sections))) {
+      return jsonResponse({ error: "Invalid service-text payload" }, 400, request);
+    }
     const now = new Date().toISOString();
     const sections =
       typeof body.sections === "string"
@@ -149,7 +194,7 @@ export async function handleAdminRoutes(
       body.source_booklet_pages ?? null,
       now,
       body.status === "published" ? now : null,
-      body.status === "published" ? "admin" : null,
+      body.status === "published" ? auth.sub : null,
       body.id,
     ).run();
     return jsonResponse({ ok: true });
@@ -169,7 +214,8 @@ export async function handleAdminRoutes(
       const accounts = await listZernioAccounts();
       return jsonResponse(accounts);
     } catch (e: unknown) {
-      return jsonResponse({ error: (e as Error).message }, 500);
+      console.error("[admin] zernio accounts failed", (e as Error).message);
+      return jsonResponse({ error: "Internal server error" }, 500, request);
     }
   }
 
@@ -187,7 +233,8 @@ export async function handleAdminRoutes(
       const posts = await listZernioPosts(params);
       return jsonResponse(posts);
     } catch (e: unknown) {
-      return jsonResponse({ error: (e as Error).message }, 500);
+      console.error("[admin] zernio posts failed", (e as Error).message);
+      return jsonResponse({ error: "Internal server error" }, 500, request);
     }
   }
 
@@ -203,7 +250,8 @@ export async function handleAdminRoutes(
       const result = await createZernioPost(body);
       return jsonResponse(result);
     } catch (e: unknown) {
-      return jsonResponse({ error: (e as Error).message }, 500);
+      console.error("[admin] zernio analytics failed", (e as Error).message);
+      return jsonResponse({ error: "Internal server error" }, 500, request);
     }
   }
 
@@ -220,7 +268,8 @@ export async function handleAdminRoutes(
       const analytics = await getZernioAnalytics(params);
       return jsonResponse(analytics);
     } catch (e: unknown) {
-      return jsonResponse({ error: (e as Error).message }, 500);
+      console.error("[admin] zernio inbox failed", (e as Error).message);
+      return jsonResponse({ error: "Internal server error" }, 500, request);
     }
   }
 
@@ -238,7 +287,8 @@ export async function handleAdminRoutes(
       const conversations = await listZernioInboxConversations(params);
       return jsonResponse(conversations);
     } catch (e: unknown) {
-      return jsonResponse({ error: (e as Error).message }, 500);
+      console.error("[admin] zernio message failed", (e as Error).message);
+      return jsonResponse({ error: "Internal server error" }, 500, request);
     }
   }
 
@@ -253,7 +303,8 @@ export async function handleAdminRoutes(
       const result = await sendZernioMessage(body.conversationId, body.content, body.mediaIds);
       return jsonResponse(result);
     } catch (e: unknown) {
-      return jsonResponse({ error: (e as Error).message }, 500);
+      console.error("[admin] zernio publish failed", (e as Error).message);
+      return jsonResponse({ error: "Internal server error" }, 500, request);
     }
   }
 

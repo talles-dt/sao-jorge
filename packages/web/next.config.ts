@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
-  output: 'export',
-  distDir: 'dist',
+  output: "standalone",
+  // SSR is required so current liturgical/content updates do not require a rebuild.
   images: {
     unoptimized: true,
   },

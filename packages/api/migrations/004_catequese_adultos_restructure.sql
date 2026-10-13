@@ -5,19 +5,9 @@
 -- 1. New column for section/module grouping (used by the dedicated page)
 ALTER TABLE catechesis_lessons ADD COLUMN group_label TEXT;
 
--- 2. Table for real signup submissions (replaces the cosmetic form)
-CREATE TABLE IF NOT EXISTS catechesis_signups (
-  id                 INTEGER PRIMARY KEY AUTOINCREMENT,
-  unit_slug          TEXT NOT NULL REFERENCES catechesis_units(slug),
-  full_name          TEXT NOT NULL,
-  email              TEXT NOT NULL,
-  phone              TEXT,
-  birth_date         TEXT,
-  previous_religion  TEXT,
-  motivation         TEXT,
-  agreed_to_terms    INTEGER NOT NULL DEFAULT 0,
-  created_at         TEXT NOT NULL DEFAULT (datetime('now'))
-);
+-- 2. Ensure the target unit exists before inserting lessons with its FK.
+INSERT OR IGNORE INTO catechesis_units (slug, title, description, order_index)
+VALUES ('catequese-adultos', 'Catequese de Adultos', 'Percurso catecumenal de adultos.', 5);
 
 -- 3. Remove the old broken/duplicated lesson rows for catequese-adultos
 DELETE FROM catechesis_lessons WHERE unit_slug = 'catequese-adultos';

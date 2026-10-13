@@ -3,7 +3,7 @@
 // Refactored from monolithic 500+ line file into modular routes.
 
 import type { Env } from "./lib/types";
-import { corsHeaders, jsonResponse, todayBrasilia } from "./lib/types";
+import { addBrasiliaDays, corsHeaders, jsonResponse, todayBrasilia } from "./lib/types";
 import { runScraper } from "./lib/scraper";
 import { handleLiturgicalRoutes } from "./routes/liturgical";
 import { handleContentRoutes } from "./routes/content";
@@ -17,7 +17,7 @@ export default {
 
     // CORS preflight
     if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: corsHeaders() });
+      return new Response(null, { status: 204, headers: corsHeaders(request) });
     }
 
     // Health check
@@ -31,16 +31,17 @@ export default {
 
     // Route to handlers (order matters — first match wins)
     // 1. Liturgical routes
+    const withRequestCors = (response: Response) => new Response(response.body, { status: response.status, headers: { ...Object.fromEntries(response.headers), ...corsHeaders(request) } });
     const liturgicalResult = await handleLiturgicalRoutes(path, request, env);
-    if (liturgicalResult) return liturgicalResult;
+    if (liturgicalResult) return withRequestCors(liturgicalResult);
 
     // 2. Content routes (services, blog, bulletin, catechesis, podcast)
     const contentResult = await handleContentRoutes(path, url, request, env);
-    if (contentResult) return contentResult;
+    if (contentResult) return withRequestCors(contentResult);
 
     // 3. Admin routes
     const adminResult = await handleAdminRoutes(path, request, env);
-    if (adminResult) return adminResult;
+    if (adminResult) return withRequestCors(adminResult);
 
     return jsonResponse({ error: "Not found" }, 404);
   },
@@ -56,11 +57,8 @@ export default {
       await runScraper(env);
       // Invalidate ALL date caches (today + next 7 days)
       const today = todayBrasilia();
-      const [y, m, d] = today.split("-").map(Number);
       for (let i = 0; i < 8; i++) {
-        const date = new Date(y, m - 1, d + i);
-        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-        await env.DAY_CACHE.delete("day:" + dateStr);
+        await env.DAY_CACHE.delete("day:" + addBrasiliaDays(today, i));
       }
     } catch (e: unknown) {
       console.error("[cron] Scraper failed:", (e as Error).message);

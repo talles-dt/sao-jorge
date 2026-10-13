@@ -1,6 +1,10 @@
 # ☩ São Jorge Parish Webapp — Deploy Guide
 ## Igreja Ortodoxa Antioquena de Curitiba
 
+> This document describes the legacy `deploy/` worker/frontend layout. The active
+> v2 monorepo deployment is documented in [`DEPLOY_V2.md`](../DEPLOY_V2.md) and
+> uses Cloudflare Access rather than `ADMIN_TOKEN`.
+
 Everything you need to go from zero to live. Follow in order.
 
 ---

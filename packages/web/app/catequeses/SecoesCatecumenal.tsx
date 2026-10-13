@@ -24,7 +24,7 @@ import {
   IconSunCloud,
   IconGift,
   IconCrosshairs2,
-} from "nucleo-sharp";
+} from "@/components/ParishIcons";
 
 // ===== COLORS (liturgical theme) =====
 const c = {

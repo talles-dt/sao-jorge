@@ -18,9 +18,9 @@ export default function AdminBulletinPage() {
     e.preventDefault();
     const res = await fetch(`${API_URL}/api/admin/bulletin`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("adminToken") ?? ""}`,
       },
       body: JSON.stringify(form),
     });

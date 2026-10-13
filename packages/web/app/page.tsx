@@ -10,9 +10,10 @@ const FAST_LABELS: Record<string, string> = {
   xerophagy: "Xerofagia",
 };
 
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: { searchParams?: Promise<{ date?: string }> }) {
+  const selectedDate = (await searchParams)?.date;
   const [dayRes, bulletinsRes, postsRes] = await Promise.all([
-    fetchDay(),
+    fetchDay(selectedDate),
     fetchBulletins(3),
     fetchPosts(3),
   ]);
@@ -39,7 +40,7 @@ export default async function HomePage() {
           <div className="absolute top-3 right-4 text-2xl opacity-10 select-none">☩</div>
 
           <h2 className="text-sm uppercase tracking-widest text-stone-500 font-ui mb-2">
-            Hoje litúrgico
+            {selectedDate ? "Dia litúrgico" : "Hoje litúrgico"}
           </h2>
 
           {day ? (
@@ -84,6 +85,14 @@ export default async function HomePage() {
                   </span>
                 )}
               </div>
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-stone-500">
+                <Link href={`/?date=${new Date(new Date(day.date + "T12:00:00").getTime() - 86400000).toISOString().slice(0, 10)}`} className="hover:text-stone-800">← Dia anterior</Link>
+                <Link href="/" className="hover:text-stone-800">Hoje</Link>
+                <Link href={`/?date=${new Date(new Date(day.date + "T12:00:00").getTime() + 86400000).toISOString().slice(0, 10)}`} className="hover:text-stone-800">Próximo dia →</Link>
+              </div>
+              <p className="mt-3 text-[11px] text-stone-500">
+                Fonte: {day.source ?? "calendário litúrgico"} · Atualizado: {day.updated_at ?? day.scraped_at ?? "não informado"}
+              </p>
               {(day.epistle_ref || day.gospel_ref) && (
                 <div className="mt-4 text-sm text-stone-600 space-y-1">
                   {day.epistle_ref && <p>Epístola: {day.epistle_ref}</p>}
@@ -98,7 +107,7 @@ export default async function HomePage() {
             </>
           ) : (
             <div className="text-stone-600 italic">
-              Dados litúrgicos do dia em preparação…
+              {dayRes.error ? "Não foi possível carregar os dados litúrgicos agora." : "Dados litúrgicos do dia em preparação…"}
             </div>
           )}
         </div>
