@@ -151,7 +151,9 @@ export default async function HomePage({ searchParams }: { searchParams?: Promis
             </Link>
           </div>
           <div className="space-y-3">
-            {bulletinsRes.data?.length ? (
+            {bulletinsRes.error ? (
+              <p role="status" className="text-amber-300 italic text-sm">Avisos temporariamente indisponíveis.</p>
+            ) : bulletinsRes.data?.length ? (
               bulletinsRes.data.map((b: any) => (
                 <div
                   key={b.id}
@@ -186,7 +188,9 @@ export default async function HomePage({ searchParams }: { searchParams?: Promis
             </Link>
           </div>
           <div className="space-y-3">
-            {postsRes.data?.length ? (
+            {postsRes.error ? (
+              <p role="status" className="text-amber-300 italic text-sm">Artigos temporariamente indisponíveis.</p>
+            ) : postsRes.data?.length ? (
               postsRes.data.map((p: any) => (
                 <Link
                   href={`/blog/${p.slug}`}

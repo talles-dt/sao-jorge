@@ -11,7 +11,7 @@ function safeUrl(value: string | null | undefined, allowImages = false): string 
     const allowed = allowImages ? ["https:"] : ["https:", "http:", "mailto:"];
     return allowed.includes(url.protocol) ? value : "";
   } catch {
-    return value.startsWith("/") ? value : "";
+    return value.startsWith("/") && !value.startsWith("//") ? value : "";
   }
 }
 

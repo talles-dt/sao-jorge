@@ -1,7 +1,7 @@
 // ☩ São Jorge V2 — Admin routes
 
 import type { Env } from "../lib/types";
-import { jsonResponse, checkAdminAuth, todayBrasilia } from "../lib/types";
+import { jsonResponse, checkAdminAuth } from "../lib/types";
 import { runScraper } from "../lib/scraper";
 import { boundedText, isIsoDate, isOneOf } from "../lib/validation";
 import { getZernioClient, listZernioAccounts, createZernioPost, listZernioPosts, getZernioAnalytics, listZernioInboxConversations, sendZernioMessage } from "@sao-jorge/shared/zernio";
@@ -68,7 +68,8 @@ export async function handleAdminRoutes(
       new Date().toISOString(),
     ).run();
     await env.DAY_CACHE.delete(`day:${String(date)}`);
-    if (String(date) === todayBrasilia()) await env.DAY_CACHE.delete(`day:${String(date)}`);
+    // The public "today" route uses the same date-key; this single purge is
+    // sufficient and avoids pretending that a second cache namespace exists.
     const updated = await env.DB.prepare(`SELECT * FROM liturgical_days WHERE date = ?`).bind(date).first();
     return jsonResponse({ ok: true, data: updated, cache_status: "purged", updated_by: auth.email ?? auth.sub }, 200, request);
   }

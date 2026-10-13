@@ -6,9 +6,10 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 ENVIRONMENT = "production"
 TZ = "America/Sao_Paulo"
-ACCESS_TEAM_DOMAIN = "YOUR-TEAM.cloudflareaccess.com"
+ACCESS_TEAM_DOMAIN = "talles-f1e.cloudflareaccess.com"
 ACCESS_AUDIENCE = "SET_IN_ENVIRONMENT"
 ACCESS_ADMIN_ROLE = "parish-admin"
+ACCESS_ADMIN_EMAILS = "talles@oliceu.com"
 
 # ── D1 Database ────────────────────────────────────────────────────────────────
 [[d1_databases]]
