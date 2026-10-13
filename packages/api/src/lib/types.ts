@@ -10,6 +10,7 @@ export interface Env {
   ACCESS_TEAM_DOMAIN: string;
   ACCESS_AUDIENCE: string;
   ACCESS_ADMIN_ROLE?: string;
+  ACCESS_ADMIN_EMAILS?: string;
   ENVIRONMENT: string;
 }
 
@@ -85,7 +86,11 @@ export async function checkAdminAuth(request: Request, env: Env): Promise<AdminC
     const { payload } = await jwtVerify(token, jwks, { issuer, audience: env.ACCESS_AUDIENCE });
     if (typeof payload.sub !== "string") return null;
     const roles = Array.isArray(payload.roles) ? payload.roles.filter((r): r is string => typeof r === "string") : [];
-    if (env.ACCESS_ADMIN_ROLE && !roles.includes(env.ACCESS_ADMIN_ROLE)) return "forbidden";
-    return { sub: payload.sub, email: typeof payload.email === "string" ? payload.email : undefined, roles, issuedAt: payload.iat };
+    const email = typeof payload.email === "string" ? payload.email.toLowerCase() : undefined;
+    const configuredEmails = (env.ACCESS_ADMIN_EMAILS ?? "").split(",").map((value) => value.trim().toLowerCase()).filter(Boolean);
+    const roleAllowed = Boolean(env.ACCESS_ADMIN_ROLE && roles.includes(env.ACCESS_ADMIN_ROLE));
+    const emailAllowed = Boolean(email && configuredEmails.includes(email));
+    if (env.ACCESS_ADMIN_ROLE && !roleAllowed && !emailAllowed) return "forbidden";
+    return { sub: payload.sub, email, roles, issuedAt: payload.iat };
   } catch { return null; }
 }

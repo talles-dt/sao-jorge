@@ -44,11 +44,12 @@ export async function handleAdminRoutes(
   if (path === "/api/admin/liturgical" && request.method === "POST") {
     const body = (await request.json()) as Record<string, unknown>;
     const { date, ...data } = body;
-    const validDate = typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date);
+    const validDate = isIsoDate(date);
     const tone = Number(data.tone_of_week ?? 1);
     const feastLevel = Number(data.feast_level ?? 0);
     const fastTypes = new Set(["none", "strict", "fish", "wine-oil", "xerophagy"]);
-    if (!validDate || !Number.isInteger(tone) || tone < 1 || tone > 8 || !Number.isInteger(feastLevel) || feastLevel < 0 || feastLevel > 6 || !fastTypes.has(String(data.fast_type ?? "none"))) {
+    const status = data.status ?? "approved";
+    if (!validDate || !Number.isInteger(tone) || tone < 1 || tone > 8 || !Number.isInteger(feastLevel) || feastLevel < 0 || feastLevel > 6 || !fastTypes.has(String(data.fast_type ?? "none")) || !isOneOf(status, ["pending", "approved", "published"] as const) || !boundedText(data.feast_name_pt, 240) || (data.feast_name_ar !== undefined && !boundedText(data.feast_name_ar, 240, false)) || (data.epistle_ref !== undefined && !boundedText(data.epistle_ref, 160, false)) || (data.gospel_ref !== undefined && !boundedText(data.gospel_ref, 160, false))) {
       return jsonResponse({ error: "Invalid liturgical day payload" }, 400, request);
     }
     await env.DB.prepare(
@@ -63,7 +64,7 @@ export async function handleAdminRoutes(
       data.epistle_ref,
       data.gospel_ref,
       "manual-override",
-      data.status ?? "approved",
+      status,
       new Date().toISOString(),
     ).run();
     await env.DAY_CACHE.delete(`day:${String(date)}`);

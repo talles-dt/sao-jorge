@@ -49,9 +49,10 @@ name = "sao-jorge-api-staging"
 [env.staging.vars]
 ENVIRONMENT = "staging"
 TZ = "America/Sao_Paulo"
-ACCESS_TEAM_DOMAIN = "YOUR-TEAM.cloudflareaccess.com"
-ACCESS_AUDIENCE = "SET_STAGING_ACCESS_AUDIENCE"
+ACCESS_TEAM_DOMAIN = "talles-f1e.cloudflareaccess.com"
+ACCESS_AUDIENCE = "72dcbad3a679fdd341564c4d511c578a5995a70eb2fbf10d1a4842d3a637fa33"
 ACCESS_ADMIN_ROLE = "parish-admin"
+ACCESS_ADMIN_EMAILS = "talles@oliceu.com"
 
 [[env.staging.d1_databases]]
 binding = "DB"
