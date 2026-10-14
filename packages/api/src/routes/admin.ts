@@ -29,9 +29,14 @@ export async function handleAdminRoutes(
   if (path === "/api/admin/catechesis-signups" && request.method === "GET") {
     const returnTo = new URL(request.url).searchParams.get("return_to");
     const requestOrigin = new URL(request.url).origin;
-    const sameWorkerAdminUrl = `${requestOrigin}/admin`;
-    if (returnTo && ((env.ADMIN_UI_URL && returnTo === env.ADMIN_UI_URL) || returnTo === sameWorkerAdminUrl)) {
-      return Response.redirect(returnTo, 303);
+    const sameWorkerAdminPrefix = `${requestOrigin}/admin`;
+    if (returnTo && ((env.ADMIN_UI_URL && returnTo === env.ADMIN_UI_URL) || returnTo === sameWorkerAdminPrefix || returnTo.startsWith(`${sameWorkerAdminPrefix}/`))) {
+      const token = request.headers.get("Cf-Access-Jwt-Assertion");
+      const responseHeaders = new Headers({ Location: returnTo });
+      if (token) {
+        responseHeaders.append("Set-Cookie", `SJ_AdminAccess=${encodeURIComponent(token)}; Max-Age=3600; Path=/admin; Secure; HttpOnly; SameSite=Lax`);
+      }
+      return new Response(null, { status: 303, headers: responseHeaders });
     }
     const rows = await env.DB.prepare(`SELECT id, unit_slug, full_name, email, phone, birth_date, previous_religion, motivation, consent_version, consented_at, privacy_policy_version, retention_until, created_at FROM catechesis_signups WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT 100`).all();
     await audit(env, auth, "read", "catechesis_signup");

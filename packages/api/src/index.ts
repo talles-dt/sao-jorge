@@ -13,6 +13,12 @@ function isAdminUiPath(path: string): boolean {
   return path === "/admin" || path.startsWith("/admin/") || path.startsWith("/_next/");
 }
 
+function cookieValue(request: Request, name: string): string | null {
+  const cookies = request.headers.get("Cookie")?.split(";") ?? [];
+  const entry = cookies.map((cookie) => cookie.trim()).find((cookie) => cookie.startsWith(`${name}=`));
+  return entry ? decodeURIComponent(entry.slice(name.length + 1)) : null;
+}
+
 async function proxyAdminUi(request: Request, env: Env): Promise<Response> {
   const uiOrigin = env.ADMIN_UI_ORIGIN ?? "";
   if (!uiOrigin.startsWith("https://")) {
@@ -65,9 +71,22 @@ export default {
     // Access-protected API. This keeps the Access session first-party even
     // while the public website remains hosted on Vercel.
     if (isAdminUiPath(path)) {
-      // The UI shell itself contains no parish data and is proxied here so
-      // the browser's API calls are first-party. Every data read/write still
-      // goes through /api/admin/*, which remains Access-protected.
+      // Bootstrap the UI session through the already Access-protected API
+      // route. The validated JWT is copied into a short-lived HttpOnly cookie
+      // so nested /admin/* requests are protected by the Worker as well.
+      const accessToken = cookieValue(request, "SJ_AdminAccess");
+      const authRequest = new Request(request, { headers: new Headers(request.headers) });
+      if (!authRequest.headers.has("Cf-Access-Jwt-Assertion") && accessToken) {
+        authRequest.headers.set("Cf-Access-Jwt-Assertion", accessToken);
+      }
+      const auth = await checkAdminAuth(authRequest, env);
+      if (!auth) {
+        if (path.startsWith("/_next/")) return proxyAdminUi(request, env);
+        const login = new URL("/api/admin/catechesis-signups", request.url);
+        login.searchParams.set("return_to", new URL(path === "/admin" ? "/admin" : path, request.url).toString());
+        return Response.redirect(login.toString(), 303);
+      }
+      if (auth === "forbidden") return jsonResponse({ error: "Forbidden" }, 403, request);
       return proxyAdminUi(request, env);
     }
 
