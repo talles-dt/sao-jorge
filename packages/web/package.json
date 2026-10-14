@@ -8,6 +8,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "cd ../shared && npm run build",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
