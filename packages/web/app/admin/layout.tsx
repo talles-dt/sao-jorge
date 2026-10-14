@@ -4,14 +4,16 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://sao-jorge-api.talles-f1e.workers.dev";
+const ADMIN_URL = "https://sao-jorge-iota.vercel.app/admin";
 
 function AdminAccessGate({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<"checking" | "authorized" | "login">("checking");
-  const loginUrl = `${API_URL}/api/admin/catechesis-signups`;
+  const checkUrl = `${API_URL}/api/admin/catechesis-signups`;
+  const loginUrl = `${checkUrl}?return_to=${encodeURIComponent(ADMIN_URL)}`;
 
   useEffect(() => {
     let active = true;
-    fetch(loginUrl, { credentials: "include", headers: { Accept: "application/json" } })
+    fetch(checkUrl, { credentials: "include", headers: { Accept: "application/json" } })
       .then((response) => {
         if (active) setState(response.ok ? "authorized" : "login");
       })
@@ -19,7 +21,7 @@ function AdminAccessGate({ children }: { children: React.ReactNode }) {
         if (active) setState("login");
       });
     return () => { active = false; };
-  }, [loginUrl]);
+  }, [checkUrl]);
 
   if (state === "checking") {
     return <main className="min-h-screen bg-stone-950 text-stone-200 p-8">Verificando acesso administrativo…</main>;
