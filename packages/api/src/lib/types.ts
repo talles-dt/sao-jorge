@@ -86,7 +86,8 @@ export async function checkAdminAuth(request: Request, env: Env): Promise<AdminC
   try {
     const issuer = `https://${env.ACCESS_TEAM_DOMAIN}`;
     const jwks = createRemoteJWKSet(new URL(`${issuer}/cdn-cgi/access/certs`));
-    const { payload } = await jwtVerify(token, jwks, { issuer, audience: env.ACCESS_AUDIENCE });
+    const audiences = env.ACCESS_AUDIENCE.split(",").map((value) => value.trim()).filter(Boolean);
+    const { payload } = await jwtVerify(token, jwks, { issuer, audience: audiences });
     if (typeof payload.sub !== "string") return null;
     const roles = Array.isArray(payload.roles) ? payload.roles.filter((r): r is string => typeof r === "string") : [];
     const email = typeof payload.email === "string" ? payload.email.toLowerCase() : undefined;
