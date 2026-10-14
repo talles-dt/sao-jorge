@@ -2,7 +2,10 @@
 
 import type { Env } from "../lib/types";
 import { jsonResponse } from "../lib/types";
-import { normalizeLimit } from "../lib/validation";
+import { boundedText, isEmail, isIsoDate, normalizeLimit } from "../lib/validation";
+
+const CONSENT_VERSION = "2026-10-13";
+const PRIVACY_POLICY_VERSION = "2026-10-13";
 
 async function consumeSignupRateLimit(env: Env, key: string, max: number): Promise<boolean> {
   const windowStart = new Date().toISOString().slice(0, 13);
@@ -131,14 +134,22 @@ export async function handleContentRoutes(
       return jsonResponse({ error: "JSON inválido" }, 400);
     }
 
-    const unitSlug = String(body.unit_slug ?? "").trim();
-    const fullName = String(body.full_name ?? "").trim();
-    const email = String(body.email ?? "").trim().toLowerCase();
+    const unitSlug = typeof body.unit_slug === "string" ? body.unit_slug.trim() : "";
+    const fullName = typeof body.full_name === "string" ? body.full_name.trim() : "";
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const agreedToTerms = body.agreed_to_terms === true;
+    const phone = body.phone === undefined || body.phone === null || body.phone === "" ? null : body.phone;
+    const birthDate = body.birth_date === undefined || body.birth_date === null || body.birth_date === "" ? null : body.birth_date;
+    const previousReligion = body.previous_religion === undefined || body.previous_religion === null || body.previous_religion === "" ? null : body.previous_religion;
+    const motivation = body.motivation === undefined || body.motivation === null || body.motivation === "" ? null : body.motivation;
 
-    if (!unitSlug || !fullName || !email) {
+    if (!boundedText(unitSlug, 160) || !boundedText(fullName, 240) || !isEmail(email) ||
+      (phone !== null && !boundedText(phone, 40, false)) ||
+      (birthDate !== null && (!isIsoDate(birthDate) || !boundedText(birthDate, 10))) ||
+      (previousReligion !== null && !boundedText(previousReligion, 240, false)) ||
+      (motivation !== null && !boundedText(motivation, 4000, false))) {
       return jsonResponse(
-        { error: "Nome completo, e-mail e unidade são obrigatórios." },
+        { error: "Os dados da inscrição são inválidos." },
         400,
       );
     }
@@ -148,11 +159,6 @@ export async function handleContentRoutes(
         400,
       );
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return jsonResponse({ error: "E-mail inválido." }, 400);
-    }
-
     const unit = await env.DB.prepare(
       `SELECT slug FROM catechesis_units WHERE slug = ?`,
     ).bind(unitSlug).first();
@@ -186,11 +192,11 @@ export async function handleContentRoutes(
         unitSlug,
         fullName,
         email,
-        body.phone ? String(body.phone) : null,
-        body.birth_date ? String(body.birth_date) : null,
-        body.previous_religion ? String(body.previous_religion) : null,
-        body.motivation ? String(body.motivation) : null,
-        1, "2026-10-13", new Date().toISOString(), "2026-10-13", retentionUntil,
+        phone,
+        birthDate,
+        previousReligion,
+        motivation,
+        1, CONSENT_VERSION, new Date().toISOString(), PRIVACY_POLICY_VERSION, retentionUntil,
       ).run();
     } catch (error) {
       await releaseSignupRateLimit(env, ipKey);

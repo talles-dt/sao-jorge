@@ -21,3 +21,7 @@ export function boundedText(value: unknown, max: number, required = true): value
 export function isOneOf<T extends string>(value: unknown, allowed: readonly T[]): value is T {
   return typeof value === "string" && allowed.includes(value as T);
 }
+
+export function isEmail(value: unknown): value is string {
+  return typeof value === "string" && value.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}

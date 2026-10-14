@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { boundedText, isIsoDate, isLiturgicalBounds, isOneOf, normalizeLimit } from "./validation";
+import { boundedText, isEmail, isIsoDate, isLiturgicalBounds, isOneOf, normalizeLimit } from "./validation";
 
 describe("API validation", () => {
   it("clamps public limits", () => {
@@ -23,5 +23,11 @@ describe("API validation", () => {
     expect(boundedText("too long", 3)).toBe(false);
     expect(isOneOf("published", ["draft", "published"] as const)).toBe(true);
     expect(isOneOf("deleted", ["draft", "published"] as const)).toBe(false);
+  });
+
+  it("accepts only bounded email addresses", () => {
+    expect(isEmail("person@example.org")).toBe(true);
+    expect(isEmail("not-an-email")).toBe(false);
+    expect(isEmail("x".repeat(321) + "@example.org")).toBe(false);
   });
 });

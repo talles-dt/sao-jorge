@@ -1,40 +1,33 @@
-name: Deploy Cloudflare Workers
+name: Deploy São Jorge API
 
 on:
   push:
     branches: [main]
     paths:
-      - 'workers/**'
-      - 'src/**'
-      - 'package.json'
-      - 'package-lock.json'
+      - "packages/api/**"
+      - "packages/shared/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/deploy-workers.yml"
+  workflow_dispatch:
 
 jobs:
   deploy:
-    name: Deploy to Cloudflare Workers
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: |
-          cd workers
-          npm ci
-
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
-          workingDirectory: workers
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run type-check
+      - run: npm test --workspace=@sao-jorge/api
+      - name: Deploy production Worker
+        working-directory: packages/api
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
