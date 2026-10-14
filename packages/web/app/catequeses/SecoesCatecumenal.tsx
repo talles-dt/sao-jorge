@@ -93,8 +93,9 @@ const BemVindo = ({ onStart }: { onStart: () => void }) => (
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.2 }}
     >
-      <h1 className="font-display text-3xl md:text-4xl text-lit-gold mb-4 flex items-center justify-center gap-3">
-        <IconHouse size={32} color="#d4af37" /> Bem-Vindo ao Guia Catecumenal
+      <p className="mb-4 font-ui text-xs uppercase tracking-[0.2em] text-lit-gold">Primeira leitura</p>
+      <h1 className="font-display text-3xl md:text-5xl text-lit-gold mb-4 flex items-center justify-center gap-3">
+        <IconHouse size={32} color="#d4af37" /> Caminho Catecumenal
       </h1>
       <p className="text-stone-400 italic">Início da sua jornada espiritual na Paróquia São Jorge</p>
     </motion.div>
@@ -117,8 +118,8 @@ const BemVindo = ({ onStart }: { onStart: () => void }) => (
         <li><strong>Fundamentos da Fé:</strong> Ensinamentos essenciais</li>
         <li><strong>Vida Sacramental:</strong> Santos Mistérios</li>
         <li><strong>Práticas Espirituais:</strong> Oração, jejum, ascese</li>
-        <li><strong>Quizzes Interativos:</strong> Teste seus conhecimentos</li>
-        <li><strong>Recursos:</strong> Leituras e materiais</li>
+        <li><strong>Revisões opcionais:</strong> retome o que foi lido</li>
+        <li><strong>Encontros oficiais:</strong> o currículo completo continua abaixo</li>
       </ul>
     </motion.div>
 
@@ -128,13 +129,11 @@ const BemVindo = ({ onStart }: { onStart: () => void }) => (
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.4 }}
     >
-      <h3 className="text-xl font-display text-lit-gold mb-4">Como usar este guia:</h3>
+      <h3 className="text-xl font-display text-lit-gold mb-4">Como caminhar:</h3>
       <ol className="list-decimal list-inside space-y-3 text-lit-text-secondary">
-        <li><strong>Navegue</strong> pelo menu lateral</li>
-        <li><strong>Responda</strong> aos quizzes</li>
-        <li><strong>Acompanhe</strong> seu progresso</li>
-        <li><strong>Interaja</strong> com os elementos</li>
-        <li><strong>Ative</strong> o modo escuro</li>
+        <li><strong>Escute:</strong> leia sem pressa e deixe as perguntas amadurecerem.</li>
+        <li><strong>Pratique:</strong> leve uma pequena ação para a semana.</li>
+        <li><strong>Caminhe com a Igreja:</strong> use os encontros oficiais como próximo passo.</li>
       </ol>
     </motion.div>
 
