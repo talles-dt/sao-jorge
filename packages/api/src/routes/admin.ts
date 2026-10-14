@@ -3,7 +3,7 @@
 import type { Env } from "../lib/types";
 import { jsonResponse, checkAdminAuth } from "../lib/types";
 import { runScraper } from "../lib/scraper";
-import { boundedText, isIsoDate, isOneOf, normalizeLimit } from "../lib/validation";
+import { boundedText, isBoundedStringArray, isIsoDate, isOneOf, normalizeLimit } from "../lib/validation";
 import { getZernioClient, listZernioAccounts, createZernioPost, listZernioPosts, getZernioAnalytics, listZernioInboxConversations, sendZernioMessage } from "@sao-jorge/shared/zernio";
 
 async function audit(env: Env, actor: { sub: string; email?: string }, action: string, resourceType: string, resourceId?: string, metadata?: Record<string, unknown>) {
@@ -84,7 +84,7 @@ export async function handleAdminRoutes(
   // Admin: blog post create/update
   if (path === "/api/admin/blog" && request.method === "POST") {
     const body = (await request.json()) as Record<string, unknown>;
-    if (!boundedText(body.slug, 160) || !boundedText(body.title, 240) || !boundedText(body.excerpt, 1000) || !boundedText(body.body, 200000) || !boundedText(body.author, 160) || !boundedText(body.category, 40) || (body.status !== undefined && !isOneOf(body.status, ["draft", "published"] as const)) || (body.tags !== undefined && !Array.isArray(body.tags))) {
+    if (!boundedText(body.slug, 160) || !boundedText(body.title, 240) || !boundedText(body.excerpt, 1000) || !boundedText(body.body, 200000) || !boundedText(body.author, 160) || !boundedText(body.category, 40) || (body.status !== undefined && !isOneOf(body.status, ["draft", "published"] as const)) || (body.tags !== undefined && !isBoundedStringArray(body.tags, 80, 30))) {
       return jsonResponse({ error: "Invalid blog payload" }, 400, request);
     }
     const now = new Date().toISOString();
@@ -145,16 +145,19 @@ export async function handleAdminRoutes(
   }
 
   // Admin: service-texts create
-  if (path === "/api/admin/service-texts" && request.method === "POST") {
+    if (path === "/api/admin/service-texts" && request.method === "POST") {
     const body = (await request.json()) as Record<string, unknown>;
     if (!boundedText(body.slug, 160) || !boundedText(body.title_pt, 240) || !boundedText(body.category, 60) || (body.status !== undefined && !isOneOf(body.status, ["pending", "approved", "published"] as const)) || (body.sections !== undefined && typeof body.sections !== "string" && !Array.isArray(body.sections))) {
       return jsonResponse({ error: "Invalid service-text payload" }, 400, request);
     }
+    const catalogEntry = await env.DB.prepare(`SELECT slug FROM service_catalog WHERE slug = ?`).bind(body.slug).first();
+    if (!catalogEntry) return jsonResponse({ error: "Service catalog entry not found" }, 400, request);
     const now = new Date().toISOString();
     const sections =
       typeof body.sections === "string"
         ? body.sections
         : JSON.stringify(body.sections ?? []);
+    if (sections.length > 200000) return jsonResponse({ error: "Invalid service-text payload" }, 400, request);
     const currentVersion = await env.DB.prepare(
       `SELECT MAX(version) as max_v FROM service_texts WHERE slug = ?`,
     )
@@ -193,6 +196,7 @@ export async function handleAdminRoutes(
       typeof body.sections === "string"
         ? body.sections
         : JSON.stringify(body.sections ?? []);
+    if (sections.length > 200000) return jsonResponse({ error: "Invalid service-text payload" }, 400, request);
     await env.DB.prepare(
       `UPDATE service_texts SET title_pt = ?, title_ar = ?, title_ar_transliterated = ?, category = ?, subcategory = ?, sections = ?, status = ?, source_booklet_pages = ?, updated_at = ?, approved_at = ?, approved_by = ? WHERE id = ?`,
     ).bind(

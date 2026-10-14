@@ -25,3 +25,7 @@ export function isOneOf<T extends string>(value: unknown, allowed: readonly T[])
 export function isEmail(value: unknown): value is string {
   return typeof value === "string" && value.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
+
+export function isBoundedStringArray(value: unknown, itemMax: number, arrayMax: number): value is string[] {
+  return Array.isArray(value) && value.length <= arrayMax && value.every((item) => boundedText(item, itemMax));
+}

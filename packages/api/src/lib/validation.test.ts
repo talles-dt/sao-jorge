@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { boundedText, isEmail, isIsoDate, isLiturgicalBounds, isOneOf, normalizeLimit } from "./validation";
+import { boundedText, isBoundedStringArray, isEmail, isIsoDate, isLiturgicalBounds, isOneOf, normalizeLimit } from "./validation";
 
 describe("API validation", () => {
   it("clamps public limits", () => {
@@ -29,5 +29,11 @@ describe("API validation", () => {
     expect(isEmail("person@example.org")).toBe(true);
     expect(isEmail("not-an-email")).toBe(false);
     expect(isEmail("x".repeat(321) + "@example.org")).toBe(false);
+  });
+
+  it("bounds structured string arrays", () => {
+    expect(isBoundedStringArray(["orthodox", "parish"], 20, 3)).toBe(true);
+    expect(isBoundedStringArray(["x".repeat(21)], 20, 3)).toBe(false);
+    expect(isBoundedStringArray(["a", 2], 20, 3)).toBe(false);
   });
 });
