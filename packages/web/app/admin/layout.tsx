@@ -33,8 +33,6 @@ function AdminAccessGate({ children }: { children: React.ReactNode }) {
         <p className="mt-3 text-stone-300">Entre pelo Cloudflare Access para habilitar as operações do painel.</p>
         <a
           href={loginUrl}
-          target="_blank"
-          rel="noreferrer"
           className="inline-block mt-6 rounded-lg bg-amber-600 px-4 py-3 font-ui text-white hover:bg-amber-700"
         >
           Entrar com Cloudflare Access
