@@ -16,7 +16,7 @@ import {
   IconCircleInfo,
   IconAward,
 } from "@/components/ParishIcons";
-import { BemVindo, Fundamentos, Sacramentos, Espiritualidade, Liturgia, Historia, Paroxia, Leituras } from "./SecoesCatecumenal";
+import { BemVindo } from "./SecoesCatecumenal";
 
 export type GuideSectionId = "intro" | "fundamentos" | "sacramentos" | "espiritualidade" | "liturgia" | "historia" | "paroxia" | "proximos-passos";
 export type GuideCalloutTone = "guardar" | "praticar" | "rezar";
@@ -66,15 +66,53 @@ const S: GuideSection[] = [
   { i: "proximos-passos", t: "Próximos passos", st: "A vida continua na Igreja", ic: <IconBook size={20} /> },
 ];
 
-const sectionComponents: Record<GuideSectionId, React.ComponentType<{ onStart: () => void }>> = {
+type ChapterProps = { onStart: () => void };
+
+const GuideChapter = ({
+  eyebrow,
+  title,
+  lead,
+  body,
+  keep,
+  practice,
+  onStart,
+}: ChapterProps & { eyebrow: string; title: string; lead: string; body: string[]; keep: string; practice: string }) => (
+  <article className="space-y-8">
+    <header className="border-b border-stone-700/60 pb-8">
+      <p className="mb-3 font-ui text-xs uppercase tracking-[0.2em] text-lit-gold">{eyebrow}</p>
+      <h1 className="font-display text-3xl leading-tight text-lit-gold sm:text-5xl">{title}</h1>
+      <p className="mt-5 max-w-3xl text-xl leading-relaxed text-stone-300">{lead}</p>
+    </header>
+    <div className="max-w-3xl space-y-5 text-lg leading-loose text-lit-text-secondary">
+      {body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+    </div>
+    <div className="grid gap-4 border-y border-stone-700/50 py-6 sm:grid-cols-2">
+      <aside className="border-l-2 border-lit-gold pl-4">
+        <p className="font-ui text-xs uppercase tracking-wider text-lit-gold">Para guardar</p>
+        <p className="mt-2 text-stone-300">{keep}</p>
+      </aside>
+      <aside className="border-l-2 border-lit-red pl-4">
+        <p className="font-ui text-xs uppercase tracking-wider text-lit-red">Para praticar</p>
+        <p className="mt-2 text-stone-300">{practice}</p>
+      </aside>
+    </div>
+    <button type="button" onClick={onStart} className="inline-flex items-center gap-2 border-b border-lit-gold pb-1 font-ui text-sm text-lit-gold transition hover:text-white focus:outline-none focus:ring-2 focus:ring-lit-gold">
+      Continuar o caminho <IconChevronRight size={18} />
+    </button>
+  </article>
+);
+
+const chapter = (props: Omit<React.ComponentProps<typeof GuideChapter>, "onStart">) => (p: ChapterProps) => <GuideChapter {...props} {...p} />;
+
+const sectionComponents: Record<GuideSectionId, React.ComponentType<ChapterProps>> = {
   intro: BemVindo,
-  fundamentos: Fundamentos,
-  sacramentos: Sacramentos,
-  espiritualidade: Espiritualidade,
-  liturgia: Liturgia,
-  historia: Historia,
-  paroxia: Paroxia,
-  "proximos-passos": Leituras,
+  fundamentos: chapter({ eyebrow: "Capítulo 1", title: "Receber a fé como caminho", lead: "A fé cristã não começa com uma lista de respostas, mas com uma vida que aprendemos a receber e habitar.", body: ["A Igreja não oferece apenas ideias sobre Deus. Ela oferece um modo de viver: escutar a Escritura, rezar com a comunidade, receber os mistérios e aprender a amar concretamente.", "Por isso, a catequese é uma caminhada acompanhada. Este guia pode abrir perguntas, mas os encontros, a oração e a vida paroquial são onde essas perguntas ganham corpo."], keep: "A fé é uma relação viva antes de ser um sistema de conceitos.", practice: "Anote uma pergunta que você gostaria de levar ao próximo encontro." }),
+  sacramentos: chapter({ eyebrow: "Capítulo 2", title: "A vida recebida nos mistérios", lead: "Na Igreja, Deus não permanece distante: sua graça alcança a vida concreta por meio dos Santos Mistérios.", body: ["Batismo, Crismação, Eucaristia, Confissão e os demais mistérios não são etapas de um formulário religioso. São maneiras pelas quais Cristo reúne, cura, alimenta e envia seu povo.", "A preparação sacramental pede atenção e acompanhamento. Não é uma corrida para completar conteúdos, mas uma aprendizagem paciente de comunhão."], keep: "Os mistérios são vida da Igreja, não apenas cerimônias que observamos.", practice: "Observe, na próxima celebração, um gesto litúrgico e pergunte o que ele comunica." }),
+  espiritualidade: chapter({ eyebrow: "Capítulo 3", title: "Aprender a permanecer diante de Deus", lead: "A oração cristã forma em nós uma atenção nova: menos ansiedade por controlar e mais disponibilidade para escutar.", body: ["A tradição ortodoxa conhece a oração como trabalho do coração. Ela inclui palavras, silêncio, salmos, prostrações, jejum e a repetição humilde do nome de Jesus.", "Não se trata de fabricar uma sensação espiritual. Trata-se de voltar, muitas vezes, à presença de Deus com simplicidade, inclusive quando não sentimos nada extraordinário."], keep: "A constância humilde vale mais que a intensidade passageira.", practice: "Reserve cinco minutos por dia para permanecer em silêncio e dizer lentamente a Oração de Jesus." }),
+  liturgia: chapter({ eyebrow: "Capítulo 4", title: "Entrar no tempo da Igreja", lead: "O ano litúrgico nos ensina a viver o tempo não como consumo de novidades, mas como memória e expectativa da obra de Cristo.", body: ["Festas, jejuns, vigílias e domingos dão forma ao calendário cristão. Eles nos retiram do improviso permanente e nos devolvem a uma história maior que nossa própria pressa.", "A liturgia não é uma apresentação para espectadores. É o povo reunido para agradecer, ouvir, oferecer e comungar."], keep: "O tempo da Igreja educa o desejo e torna a fé praticável.", practice: "Consulte o calendário litúrgico desta semana e escolha uma celebração ou oração para acompanhar." }),
+  historia: chapter({ eyebrow: "Capítulo 5", title: "Receber uma memória viva", lead: "A tradição não é uma peça de museu: é a memória viva de um povo que continua aprendendo a seguir Cristo.", body: ["Os santos, os padres, os concílios e as comunidades cristãs nos ajudam a discernir. Eles não eliminam nossa responsabilidade; oferecem companhia e critérios para que não confundamos novidade com verdade.", "Conhecer a história da Igreja é aprender a reconhecer continuidades, feridas, testemunhos e a paciência de Deus ao longo das gerações."], keep: "Ninguém começa sozinho; recebemos uma herança para cuidar e transmitir.", practice: "Leia uma breve vida de santo e identifique uma prática concreta que pode ser imitada." }),
+  paroxia: chapter({ eyebrow: "Capítulo 6", title: "Tornar-se presença entre pessoas", lead: "A paróquia é o lugar onde a fé deixa de ser apenas intenção pessoal e se torna convivência, serviço e responsabilidade.", body: ["Uma comunidade cristã reúne pessoas diferentes, com ritmos e histórias diferentes. Aprender a permanecer com elas também faz parte da conversão.", "Participar não significa apenas assistir à celebração. É aprender nomes, oferecer ajuda, respeitar o trabalho escondido e descobrir onde nossa presença pode servir."], keep: "A vida cristã amadurece em comunhão, não em isolamento.", practice: "Depois da próxima celebração, permaneça alguns minutos e conheça uma pessoa da comunidade." }),
+  "proximos-passos": chapter({ eyebrow: "Capítulo 7", title: "O próximo passo é um encontro real", lead: "Este guia termina apontando para fora de si: para os encontros oficiais, o sacerdote, a comunidade e uma vida que continua sendo acompanhada.", body: ["Nenhuma leitura substitui a catequese presencial ou o discernimento pastoral. O conteúdo introdutório serve para orientar o primeiro passo e tornar as perguntas mais honestas.", "Abaixo desta experiência estão os encontros oficiais da Paróquia São Jorge. Leia-os no seu ritmo, leve dúvidas ao acompanhamento e permita que o caminho tenha tempo."], keep: "O guia é uma porta de entrada; a formação acontece em uma caminhada acompanhada.", practice: "Abra o primeiro encontro oficial e escolha uma data para começar." }),
 };
 
 // ===== MAIN APP =====
