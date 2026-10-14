@@ -102,7 +102,11 @@ const GuideChapter = ({
   </article>
 );
 
-const chapter = (props: Omit<React.ComponentProps<typeof GuideChapter>, "onStart">) => (p: ChapterProps) => <GuideChapter {...props} {...p} />;
+const chapter = (props: Omit<React.ComponentProps<typeof GuideChapter>, "onStart">) => {
+  const Chapter = (p: ChapterProps) => <GuideChapter {...props} {...p} />;
+  Chapter.displayName = `GuideChapter(${props.title})`;
+  return Chapter;
+};
 
 const sectionComponents: Record<GuideSectionId, React.ComponentType<ChapterProps>> = {
   intro: BemVindo,
