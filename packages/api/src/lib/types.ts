@@ -40,6 +40,7 @@ export interface LiturgicalDayRow {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const ALLOWED_ORIGINS = new Set([
+  "https://sao-jorge-iota.vercel.app",
   "https://sao-jorge.oliceu.com",
   "https://ortodoxiacwb.oliceu.com",
   "http://localhost:3000",
