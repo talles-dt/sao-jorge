@@ -3,7 +3,7 @@
 import type { Env } from "../lib/types";
 import { jsonResponse, checkAdminAuth } from "../lib/types";
 import { runScraper } from "../lib/scraper";
-import { boundedText, isIsoDate, isOneOf } from "../lib/validation";
+import { boundedText, isIsoDate, isOneOf, normalizeLimit } from "../lib/validation";
 import { getZernioClient, listZernioAccounts, createZernioPost, listZernioPosts, getZernioAnalytics, listZernioInboxConversations, sendZernioMessage } from "@sao-jorge/shared/zernio";
 
 async function audit(env: Env, actor: { sub: string; email?: string }, action: string, resourceType: string, resourceId?: string, metadata?: Record<string, unknown>) {
@@ -74,6 +74,7 @@ export async function handleAdminRoutes(
       new Date().toISOString(),
     ).run();
     await env.DAY_CACHE.delete(`day:${String(date)}`);
+    await audit(env, auth, "update", "liturgical_day", String(date), { source: "manual-override", status });
     // The public "today" route uses the same date-key; this single purge is
     // sufficient and avoids pretending that a second cache namespace exists.
     const updated = await env.DB.prepare(`SELECT * FROM liturgical_days WHERE date = ?`).bind(date).first();
@@ -101,6 +102,7 @@ export async function handleAdminRoutes(
       body.status === "published" ? now : body.published_at,
       now,
     ).run();
+    await audit(env, auth, "upsert", "blog_post", String(body.slug), { status: body.status ?? "draft" });
     return jsonResponse({ ok: true });
   }
 
@@ -120,6 +122,7 @@ export async function handleAdminRoutes(
       body.expires_date ?? null,
       body.status ?? "pending",
     ).run();
+    await audit(env, auth, "upsert", "bulletin", String(body.title), { status: body.status ?? "pending" });
     return jsonResponse({ ok: true });
   }
 
@@ -175,6 +178,7 @@ export async function handleAdminRoutes(
       body.status === "published" ? now : null,
       body.status === "published" ? auth.sub : null,
     ).run();
+    await audit(env, auth, "create", "service_text", `${String(body.slug)}:v${version}`, { status: body.status ?? "pending" });
     return jsonResponse({ ok: true, version });
   }
 
@@ -205,6 +209,7 @@ export async function handleAdminRoutes(
       body.status === "published" ? auth.sub : null,
       body.id,
     ).run();
+    await audit(env, auth, "update", "service_text", String(body.id), { status: body.status ?? "pending" });
     return jsonResponse({ ok: true });
   }
 
@@ -235,8 +240,8 @@ export async function handleAdminRoutes(
         status: url.searchParams.get("status") || undefined,
         platform: url.searchParams.get("platform") || undefined,
         accountId: url.searchParams.get("accountId") || undefined,
-        limit: url.searchParams.get("limit") ? parseInt(url.searchParams.get("limit")!) : undefined,
-        offset: url.searchParams.get("offset") ? parseInt(url.searchParams.get("offset")!) : undefined,
+        limit: normalizeLimit(url.searchParams.get("limit"), 20, 100),
+        offset: Math.max(0, Number.parseInt(url.searchParams.get("offset") ?? "0", 10) || 0),
       };
       const posts = await listZernioPosts(params);
       return jsonResponse(posts);
@@ -289,8 +294,8 @@ export async function handleAdminRoutes(
         platform: url.searchParams.get("platform") || undefined,
         accountId: url.searchParams.get("accountId") || undefined,
         status: url.searchParams.get("status") || undefined,
-        limit: url.searchParams.get("limit") ? parseInt(url.searchParams.get("limit")!) : undefined,
-        offset: url.searchParams.get("offset") ? parseInt(url.searchParams.get("offset")!) : undefined,
+        limit: normalizeLimit(url.searchParams.get("limit"), 20, 100),
+        offset: Math.max(0, Number.parseInt(url.searchParams.get("offset") ?? "0", 10) || 0),
       };
       const conversations = await listZernioInboxConversations(params);
       return jsonResponse(conversations);
