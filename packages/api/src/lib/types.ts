@@ -12,6 +12,7 @@ export interface Env {
   ACCESS_ADMIN_ROLE?: string;
   ACCESS_ADMIN_EMAILS?: string;
   ADMIN_UI_URL?: string;
+  ADMIN_UI_ORIGIN?: string;
   ENVIRONMENT: string;
 }
 

@@ -11,6 +11,7 @@ ACCESS_AUDIENCE = "77ba36d5231d6829a0b374f67afe786f7ac8766c96f57ec22e5bbb8e68af8
 ACCESS_ADMIN_ROLE = "parish-admin"
 ACCESS_ADMIN_EMAILS = "talles@oliceu.com"
 ADMIN_UI_URL = "https://sao-jorge-api.talles-f1e.workers.dev/admin"
+ADMIN_UI_ORIGIN = "https://sao-jorge-iota.vercel.app"
 
 # ── D1 Database ────────────────────────────────────────────────────────────────
 [[d1_databases]]
@@ -56,6 +57,7 @@ ACCESS_AUDIENCE = "72dcbad3a679fdd341564c4d511c578a5995a70eb2fbf10d1a4842d3a637f
 ACCESS_ADMIN_ROLE = "parish-admin"
 ACCESS_ADMIN_EMAILS = "talles@oliceu.com"
 ADMIN_UI_URL = "https://sao-jorge-api-staging.talles-f1e.workers.dev/admin"
+ADMIN_UI_ORIGIN = "https://sao-jorge-iota.vercel.app"
 
 [[env.staging.d1_databases]]
 binding = "DB"

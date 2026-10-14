@@ -14,8 +14,7 @@ function isAdminUiPath(path: string): boolean {
 }
 
 async function proxyAdminUi(request: Request, env: Env): Promise<Response> {
-  const configuredUrl = env.ADMIN_UI_URL ?? "";
-  const uiOrigin = configuredUrl.replace(/\/admin\/?$/, "");
+  const uiOrigin = env.ADMIN_UI_ORIGIN ?? "";
   if (!uiOrigin.startsWith("https://")) {
     return jsonResponse({ error: "Admin UI is not configured" }, 503, request);
   }
