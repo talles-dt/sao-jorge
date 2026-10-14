@@ -17,8 +17,9 @@ type LitDayForm = {
 };
 
 export default function AdminLiturgicalPage() {
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
   const [form, setForm] = useState<LitDayForm>({
-    date: new Date().toISOString().split("T")[0],
+    date: today,
     tone_of_week: 1,
     fast_type: "none",
     feast_level: 0,
@@ -28,21 +29,27 @@ export default function AdminLiturgicalPage() {
     gospel_ref: "",
     status: "approved",
   });
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [message, setMessage] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch(`${API_URL}/api/admin/liturgical`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("adminToken") ?? ""}`,
-      },
-      body: JSON.stringify(form),
-    });
-    if (!res.ok) {
-      alert(`Erro: ${await res.text()}`);
-    } else {
-      alert("Salvo com sucesso!");
+    setSaveState("saving");
+    setMessage("");
+    try {
+      const res = await fetch(`${API_URL}/api/admin/liturgical`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(typeof result.error === "string" ? result.error : "Não foi possível salvar.");
+      setSaveState("saved");
+      setMessage(`Salvo. A API confirmou ${result.data?.date ?? form.date} e o cache foi invalidado.`);
+    } catch (error) {
+      setSaveState("error");
+      setMessage(error instanceof Error ? error.message : "Não foi possível salvar. Tente novamente.");
     }
   }
 
@@ -152,10 +159,16 @@ export default function AdminLiturgicalPage() {
         </div>
         <button
           type="submit"
+          disabled={saveState === "saving"}
           className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-lg font-ui transition"
         >
-          Salvar
+          {saveState === "saving" ? "Salvando…" : "Salvar"}
         </button>
+        {message && (
+          <p role="status" aria-live="polite" className={saveState === "error" ? "text-red-300" : "text-emerald-300"}>
+            {message}
+          </p>
+        )}
       </form>
     </div>
   );

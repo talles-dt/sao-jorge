@@ -71,7 +71,8 @@ export default function ZernioAdminPage() {
   const fetchAccounts = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/admin/zernio/accounts`, {
-        headers: { Authorization: `Bearer ${getAdminToken()}` },
+        credentials: "include",
+        headers: {},
       });
       if (!res.ok) throw new Error("Failed to fetch accounts");
       const data = await res.json();
@@ -84,7 +85,8 @@ export default function ZernioAdminPage() {
   const fetchPosts = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/admin/zernio/posts`, {
-        headers: { Authorization: `Bearer ${getAdminToken()}` },
+        credentials: "include",
+        headers: {},
       });
       if (!res.ok) throw new Error("Failed to fetch posts");
       const data = await res.json();
@@ -97,7 +99,8 @@ export default function ZernioAdminPage() {
   const fetchAnalytics = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/admin/zernio/analytics`, {
-        headers: { Authorization: `Bearer ${getAdminToken()}` },
+        credentials: "include",
+        headers: {},
       });
       if (!res.ok) throw new Error("Failed to fetch analytics");
       const data = await res.json();
@@ -110,7 +113,8 @@ export default function ZernioAdminPage() {
   const fetchInbox = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/admin/zernio/inbox`, {
-        headers: { Authorization: `Bearer ${getAdminToken()}` },
+        credentials: "include",
+        headers: {},
       });
       if (!res.ok) throw new Error("Failed to fetch inbox");
       const data = await res.json();
@@ -134,9 +138,9 @@ export default function ZernioAdminPage() {
 
       const res = await fetch(`${API_BASE}/api/admin/zernio/posts`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${getAdminToken()}`,
         },
         body: JSON.stringify({
           content: newPostContent,
@@ -158,11 +162,6 @@ export default function ZernioAdminPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const getAdminToken = () => {
-    // In a real app, this would come from auth context
-    return localStorage.getItem("admin_token") || "";
   };
 
   useEffect(() => {

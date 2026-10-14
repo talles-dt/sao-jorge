@@ -21,6 +21,9 @@ export interface LiturgicalDay {
   scraped_at: string
   approved_at: string | null
   approved_by: string | null
+  updated_at?: string
+  revision?: string
+  cache_status?: 'hit' | 'miss'
 }
 
 export interface DayEnrichment {

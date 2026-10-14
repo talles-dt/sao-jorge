@@ -124,6 +124,8 @@ export default function CatechesisSignupForm({ unitSlug }: { unitSlug: string })
         />
         <span>
           Concordo em participar regularmente dos encontros e observar os jejuns prescritos.
+          Também autorizo o uso destes dados para o contato pastoral desta inscrição,
+          conforme a <a href="/privacidade" className="underline text-lit-gold">política de privacidade</a> (versão 2026-10-13).
         </span>
       </label>
 

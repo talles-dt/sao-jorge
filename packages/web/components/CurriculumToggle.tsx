@@ -3,7 +3,10 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 
-const GuiaCatecumenal = dynamic(() => import("@/components/GuiaCatecumenal"), {
+// Keep the interactive guide on the maintained, responsive implementation.
+// The old component under /components used legacy Tailwind syntax such as
+// `text-[18]` and `m-[0 0 15px 0]`, which silently produced an unstyled layout.
+const GuiaCatecumenal = dynamic(() => import("@/app/catequeses/GuiaCatecumenal"), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center min-h-[200px]">
@@ -14,7 +17,7 @@ const GuiaCatecumenal = dynamic(() => import("@/components/GuiaCatecumenal"), {
 
 /**
  * Toggle between the database-backed curriculum (default) and the
- * interactive Guia Catecumenal with quizzes and dark mode.
+ * introductory formation guide. The official lessons remain below it.
  * Renders the curriculum by default; switches in the client-side guide
  * without a page reload.
  */
@@ -28,7 +31,7 @@ export default function CurriculumToggle() {
           onClick={() => setMode("curriculum")}
           className="fixed top-3 left-3 z-[200] bg-lit-gold text-lit-bg font-semibold px-4 py-2 rounded-lg shadow-lg"
         >
-          Voltar ao currículo
+          Voltar aos encontros oficiais
         </button>
         <GuiaCatecumenal />
       </div>
@@ -41,7 +44,7 @@ export default function CurriculumToggle() {
         onClick={() => setMode("guide")}
         className="px-4 py-2 bg-lit-gold text-lit-bg font-semibold rounded-lg hover:opacity-90 transition"
       >
-        Guia Catecumenal Interativo
+        Abrir guia introdutório
       </button>
     </div>
   );

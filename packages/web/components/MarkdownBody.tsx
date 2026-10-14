@@ -4,6 +4,21 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Components } from "react-markdown";
 
+function safeUrl(value: string | null | undefined, allowImages = false): string {
+  if (!value) return "";
+  try {
+    const url = new URL(value, "https://sao-jorge.oliceu.com");
+    const allowed = allowImages ? ["https:"] : ["https:", "http:", "mailto:"];
+    return allowed.includes(url.protocol) ? value : "";
+  } catch {
+    return value.startsWith("/") && !value.startsWith("//") ? value : "";
+  }
+}
+
+function linkUrlTransform(url: string) {
+  return safeUrl(url);
+}
+
 const components: Components = {
   h1: (props) => <h2 className="font-display text-xl text-lit-gold mt-6 mb-2" {...props} />,
   h2: (props) => <h3 className="font-display text-lg text-lit-gold mt-5 mb-2" {...props} />,
@@ -20,8 +35,11 @@ const components: Components = {
       {...props}
     />
   ),
+  a: (props) => (
+    <a {...props} href={safeUrl(typeof props.href === "string" ? props.href : undefined)} />
+  ),
   img: (props) => (
-    <img className="rounded-lg my-4 max-w-full" alt={props.alt ?? ""} {...props} />
+    <img {...props} className="rounded-lg my-4 max-w-full" alt={props.alt ?? ""} src={safeUrl(typeof props.src === "string" ? props.src : undefined, true)} />
   ),
   table: (props) => (
     <div className="overflow-x-auto my-4">
@@ -42,7 +60,7 @@ export default function MarkdownBody({ body }: { body: string }) {
   if (!body) return null;
   return (
     <div className="text-lit-text">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} urlTransform={linkUrlTransform}>
         {body}
       </ReactMarkdown>
     </div>

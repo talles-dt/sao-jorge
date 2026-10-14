@@ -1,14 +1,55 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-interface FormState {
-  error?: string;
-  success?: boolean;
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://sao-jorge-api.talles-f1e.workers.dev";
+// The authenticated panel is served through the API Worker so Cloudflare
+// Access and the admin API share a first-party origin. The public site stays
+// on Vercel; this URL is only the secure admin entry point.
+const ADMIN_URL = `${API_URL}/admin`;
+
+function AdminAccessGate({ children }: { children: React.ReactNode }) {
+  const [state, setState] = useState<"checking" | "authorized" | "login">("checking");
+  const checkUrl = `${API_URL}/api/admin/catechesis-signups`;
+  const loginUrl = `${checkUrl}?return_to=${encodeURIComponent(ADMIN_URL)}`;
+
+  useEffect(() => {
+    let active = true;
+    fetch(checkUrl, { credentials: "include", redirect: "manual", headers: { Accept: "application/json" } })
+      .then((response) => {
+        if (active) setState(response.status === 200 ? "authorized" : "login");
+      })
+      .catch(() => {
+        if (active) setState("login");
+      });
+    return () => { active = false; };
+  }, [checkUrl]);
+
+  if (state === "checking") {
+    return <main className="min-h-screen bg-stone-950 text-stone-200 p-8">Verificando acesso administrativo…</main>;
+  }
+  if (state === "login") {
+    return (
+      <main className="min-h-screen bg-stone-950 text-stone-200 p-8 max-w-xl">
+        <h1 className="text-2xl font-display text-amber-500">Login administrativo necessário</h1>
+        <p className="mt-3 text-stone-300">Entre pelo Cloudflare Access para habilitar as operações do painel.</p>
+        <a
+          href={loginUrl}
+          className="inline-block mt-6 rounded-lg bg-amber-600 px-4 py-3 font-ui text-white hover:bg-amber-700"
+        >
+          Entrar com Cloudflare Access
+        </a>
+        <p className="mt-4 text-sm text-stone-500">O painel será reaberto no endereço protegido depois do login.</p>
+      </main>
+    );
+  }
+  return <>{children}</>;
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
+    <AdminAccessGate>
     <div className="flex h-screen">
       {/* Sidebar */}
       <aside className="w-64 bg-stone-900 border-r border-stone-800 flex flex-col">
@@ -50,5 +91,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
       <main className="flex-1 overflow-auto p-8">{children}</main>
     </div>
+    </AdminAccessGate>
   );
 }

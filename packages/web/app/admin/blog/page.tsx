@@ -21,9 +21,9 @@ export default function AdminBlogPage() {
     e.preventDefault();
     const res = await fetch(`${API_URL}/api/admin/blog`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("adminToken") ?? ""}`,
       },
       body: JSON.stringify({
         ...form,

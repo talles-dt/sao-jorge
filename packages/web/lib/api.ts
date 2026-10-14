@@ -38,8 +38,9 @@ async function fetchApi<T>(
 
 /* ── Liturgical ────────────────────────────────────────────── */
 export function fetchDay(date?: string) {
-  if (date) return fetchApi<LiturgicalDay>(`/api/day/${date}`);
-  return fetchApi<LiturgicalDay>("/api/day/today");
+  const init = { cache: "no-store" as const };
+  if (date) return fetchApi<LiturgicalDay>(`/api/day/${date}`, init);
+  return fetchApi<LiturgicalDay>("/api/day/today", init);
 }
 
 /* ── Services ────────────────────────────────────────────── */

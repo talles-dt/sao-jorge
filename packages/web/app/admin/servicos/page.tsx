@@ -51,20 +51,15 @@ export default function AdminServicosPage() {
  const [jsonMode, setJsonMode] = useState(false);
  const [jsonInput, setJsonInput] = useState("");
 
- const token = typeof window !== "undefined" ? localStorage.getItem("adminToken") ?? "" : "";
-
  const fetchExisting = useCallback(async () => {
-  if (!token) return;
   try {
-   const res = await fetch(`${API_URL}/api/admin/service-texts`, {
-    headers: { Authorization: `Bearer ${token}` },
-   });
+   const res = await fetch(`${API_URL}/api/admin/service-texts`, { credentials: "include" });
    if (res.ok) {
     const data = await res.json();
     setExistingTexts(Array.isArray(data) ? data : []);
    }
   } catch {}
- }, [token]);
+ }, []);
 
  useEffect(() => { fetchExisting() }, [fetchExisting]);
 
@@ -88,9 +83,9 @@ export default function AdminServicosPage() {
   try {
    const res = await fetch(`${API_URL}/api/admin/service-texts`, {
     method: "POST",
+    credentials: "include",
     headers: {
      "Content-Type": "application/json",
-     Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ ...form, sections }),
    });
@@ -124,9 +119,9 @@ export default function AdminServicosPage() {
    };
    const res = await fetch(`${API_URL}/api/admin/service-texts`, {
     method: "POST",
+    credentials: "include",
     headers: {
      "Content-Type": "application/json",
-     Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(payload),
    });

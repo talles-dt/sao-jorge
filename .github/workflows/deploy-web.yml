@@ -1,0 +1,34 @@
+name: Deploy São Jorge Web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/web/**"
+      - "packages/shared/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run type-check
+      - run: npm run lint --workspace=@sao-jorge/web
+      - run: npm run build:web
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+      - name: Deploy to Vercel
+        run: npx vercel --prod --yes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

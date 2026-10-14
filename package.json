@@ -2,6 +2,9 @@
   "name": "sao-jorge-v2",
   "version": "2.0.0",
   "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "sharp", "unrs-resolver", "workerd"]
+  },
   "workspaces": [
     "packages/*"
   ],
@@ -10,9 +13,10 @@
     "dev:web": "cd packages/web && npm run dev",
     "build:web": "cd packages/web && npm run build",
     "deploy:api": "cd packages/api && npm run deploy",
-    "deploy:web": "cd packages/web && npm run deploy",
+    "deploy:web": "cd packages/web && npm run build",
     "db:local": "cd packages/api && npm run db:local",
     "db:migrate": "cd packages/api && npm run db:migrate",
-    "type-check": "tsc --noEmit"
+    "smoke:staging": "node scripts/staging-smoke.mjs",
+    "type-check": "npm run build --workspace=@sao-jorge/shared && npm run type-check --workspace=@sao-jorge/api && npm run type-check --workspace=@sao-jorge/web"
   }
 }
