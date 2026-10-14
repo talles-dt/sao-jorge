@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 
 // Keep the interactive guide on the maintained, responsive implementation.
@@ -23,6 +23,12 @@ const GuiaCatecumenal = dynamic(() => import("@/app/catequeses/GuiaCatecumenal")
  */
 export default function CurriculumToggle() {
   const [mode, setMode] = useState<"curriculum" | "guide">("curriculum");
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("guide") === "1") {
+      setMode("guide");
+    }
+  }, []);
 
   if (mode === "guide") {
     return (
