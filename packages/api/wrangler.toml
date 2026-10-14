@@ -7,7 +7,7 @@ compatibility_flags = ["nodejs_compat"]
 ENVIRONMENT = "production"
 TZ = "America/Sao_Paulo"
 ACCESS_TEAM_DOMAIN = "talles-f1e.cloudflareaccess.com"
-ACCESS_AUDIENCE = "SET_IN_ENVIRONMENT"
+ACCESS_AUDIENCE = "77ba36d5231d6829a0b374f67afe786f7ac8766c96f57ec22e5bbb8e68af8c88"
 ACCESS_ADMIN_ROLE = "parish-admin"
 ACCESS_ADMIN_EMAILS = "talles@oliceu.com"
 
