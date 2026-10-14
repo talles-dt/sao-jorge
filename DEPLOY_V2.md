@@ -16,6 +16,21 @@ The old `ADMIN_TOKEN` flow is not supported by v2 and must not be configured.
 The canonical production panel is:
 `https://sao-jorge-api.talles-f1e.workers.dev/admin`.
 
+To add strict Access protection to the visual shell as well, first create or
+identify a reusable administrator Allow policy, then run from the repository:
+
+```bash
+export CLOUDFLARE_ACCOUNT_ID=df1e239586a07d52679d91e9a69ccd2e
+export CF_ACCESS_POLICY_ID=<reusable-allow-policy-id>
+read -rsp "Cloudflare API token: " CLOUDFLARE_API_TOKEN; echo; export CLOUDFLARE_API_TOKEN
+node scripts/create-access-admin-app.mjs
+```
+
+Append the returned `aud` to `ACCESS_AUDIENCE` in the production Wrangler
+variables (comma-separated audiences are supported), deploy the Worker, and
+verify that `/admin/*` redirects to Access while `/api/admin/*` still returns
+the authenticated panel data.
+
 For the current staging setup, the protected path is:
 `sao-jorge-api-staging.talles-f1e.workers.dev/api/admin/*`.
 Production must use its own Access application audience (or an explicitly
