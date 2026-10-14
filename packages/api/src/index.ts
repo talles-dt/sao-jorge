@@ -3,11 +3,44 @@
 // Refactored from monolithic 500+ line file into modular routes.
 
 import type { Env } from "./lib/types";
-import { addBrasiliaDays, corsHeaders, jsonResponse, todayBrasilia } from "./lib/types";
+import { addBrasiliaDays, checkAdminAuth, corsHeaders, jsonResponse, todayBrasilia } from "./lib/types";
 import { runScraper } from "./lib/scraper";
 import { handleLiturgicalRoutes } from "./routes/liturgical";
 import { handleContentRoutes } from "./routes/content";
 import { handleAdminRoutes } from "./routes/admin";
+
+function isAdminUiPath(path: string): boolean {
+  return path === "/admin" || path.startsWith("/admin/") || path.startsWith("/_next/");
+}
+
+async function proxyAdminUi(request: Request, env: Env): Promise<Response> {
+  const configuredUrl = env.ADMIN_UI_URL ?? "";
+  const uiOrigin = configuredUrl.replace(/\/admin\/?$/, "");
+  if (!uiOrigin.startsWith("https://")) {
+    return jsonResponse({ error: "Admin UI is not configured" }, 503, request);
+  }
+
+  const incoming = new URL(request.url);
+  const target = new URL(`${incoming.pathname}${incoming.search}`, `${uiOrigin}/`);
+  const headers = new Headers(request.headers);
+  headers.delete("host");
+  headers.delete("cookie");
+  const upstream = await fetch(new Request(target, {
+    method: request.method,
+    headers,
+    body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
+    redirect: "manual",
+  }));
+  const responseHeaders = new Headers(upstream.headers);
+  responseHeaders.delete("set-cookie");
+  responseHeaders.delete("content-security-policy");
+  responseHeaders.set("cache-control", "no-store");
+  return new Response(upstream.body, {
+    status: upstream.status,
+    statusText: upstream.statusText,
+    headers: responseHeaders,
+  });
+}
 
 export default {
   // HTTP API
@@ -27,6 +60,21 @@ export default {
         env: env.ENVIRONMENT,
         date: todayBrasilia(),
       });
+    }
+
+    // Serve the protected admin UI through the same Worker hostname as the
+    // Access-protected API. This keeps the Access session first-party even
+    // while the public website remains hosted on Vercel.
+    if (isAdminUiPath(path)) {
+      const auth = await checkAdminAuth(request, env);
+      if (!auth && (path === "/admin" || path === "/admin/")) {
+        const login = new URL("/api/admin/catechesis-signups", request.url);
+        login.searchParams.set("return_to", new URL("/admin", request.url).toString());
+        return Response.redirect(login.toString(), 303);
+      }
+      if (!auth) return jsonResponse({ error: "Unauthorized" }, 401, request);
+      if (auth === "forbidden") return jsonResponse({ error: "Forbidden" }, 403, request);
+      return proxyAdminUi(request, env);
     }
 
     // Route to handlers (order matters — first match wins)

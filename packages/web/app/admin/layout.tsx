@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://sao-jorge-api.talles-f1e.workers.dev";
-const ADMIN_URL = "https://sao-jorge-iota.vercel.app/admin";
+// The authenticated panel is served through the API Worker so Cloudflare
+// Access and the admin API share a first-party origin. The public site stays
+// on Vercel; this URL is only the secure admin entry point.
+const ADMIN_URL = `${API_URL}/admin`;
 
 function AdminAccessGate({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<"checking" | "authorized" | "login">("checking");
@@ -37,7 +40,7 @@ function AdminAccessGate({ children }: { children: React.ReactNode }) {
         >
           Entrar com Cloudflare Access
         </a>
-        <p className="mt-4 text-sm text-stone-500">Depois do login, volte a esta página e ela verificará a sessão novamente.</p>
+        <p className="mt-4 text-sm text-stone-500">O painel será reaberto no endereço protegido depois do login.</p>
       </main>
     );
   }

@@ -28,7 +28,9 @@ export async function handleAdminRoutes(
 
   if (path === "/api/admin/catechesis-signups" && request.method === "GET") {
     const returnTo = new URL(request.url).searchParams.get("return_to");
-    if (returnTo && env.ADMIN_UI_URL && returnTo === env.ADMIN_UI_URL) {
+    const requestOrigin = new URL(request.url).origin;
+    const sameWorkerAdminUrl = `${requestOrigin}/admin`;
+    if (returnTo && ((env.ADMIN_UI_URL && returnTo === env.ADMIN_UI_URL) || returnTo === sameWorkerAdminUrl)) {
       return Response.redirect(returnTo, 303);
     }
     const rows = await env.DB.prepare(`SELECT id, unit_slug, full_name, email, phone, birth_date, previous_religion, motivation, consent_version, consented_at, privacy_policy_version, retention_until, created_at FROM catechesis_signups WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT 100`).all();
