@@ -66,14 +66,9 @@ export default {
     // Access-protected API. This keeps the Access session first-party even
     // while the public website remains hosted on Vercel.
     if (isAdminUiPath(path)) {
-      const auth = await checkAdminAuth(request, env);
-      if (!auth && (path === "/admin" || path === "/admin/")) {
-        const login = new URL("/api/admin/catechesis-signups", request.url);
-        login.searchParams.set("return_to", new URL("/admin", request.url).toString());
-        return Response.redirect(login.toString(), 303);
-      }
-      if (!auth) return jsonResponse({ error: "Unauthorized" }, 401, request);
-      if (auth === "forbidden") return jsonResponse({ error: "Forbidden" }, 403, request);
+      // The UI shell itself contains no parish data and is proxied here so
+      // the browser's API calls are first-party. Every data read/write still
+      // goes through /api/admin/*, which remains Access-protected.
       return proxyAdminUi(request, env);
     }
 

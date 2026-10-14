@@ -16,9 +16,9 @@ function AdminAccessGate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    fetch(checkUrl, { credentials: "include", headers: { Accept: "application/json" } })
+    fetch(checkUrl, { credentials: "include", redirect: "manual", headers: { Accept: "application/json" } })
       .then((response) => {
-        if (active) setState(response.ok ? "authorized" : "login");
+        if (active) setState(response.status === 200 ? "authorized" : "login");
       })
       .catch(() => {
         if (active) setState("login");
