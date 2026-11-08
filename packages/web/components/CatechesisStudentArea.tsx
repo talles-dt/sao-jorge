@@ -1,7 +1,9 @@
 "use client";
 import { useEffect,useState } from "react";
 import { useSearchParams } from "next/navigation";
-const API=process.env.NEXT_PUBLIC_API_URL??"https://sao-jorge-api.talles-f1e.workers.dev";
+// Use the website origin; Next rewrites these requests to the Worker so the
+// session does not depend on third-party cookies.
+const API="";
 type Meeting={id:string;meeting_number:number;starts_at:string;title:string;live_available:number;recording_published_at:string|null};
 export default function CatechesisStudentArea(){
  const params=useSearchParams(),[email,setEmail]=useState(""),[message,setMessage]=useState(""),[meetings,setMeetings]=useState<Meeting[]>([]),[video,setVideo]=useState("");

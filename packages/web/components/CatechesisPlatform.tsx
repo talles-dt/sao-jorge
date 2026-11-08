@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-const API = process.env.NEXT_PUBLIC_API_URL ?? "https://sao-jorge-api.talles-f1e.workers.dev";
+// Student requests stay on the website origin and are rewritten server-side
+// to the Worker. This keeps the HttpOnly session cookie first-party.
+const API = "";
 type Topic = { number:number; title:string; objective:string };
 type Module = { slug:string; title:string; objective:string; topics:Topic[] };
 type Cohort = { id:string; title:string; module_title:string };

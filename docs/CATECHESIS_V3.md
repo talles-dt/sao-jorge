@@ -12,6 +12,7 @@ O sistema não inclui provas, certificados, cobrança, gamificação, mentoria o
 - O Worker oferece cadastro público, magic link, área autenticada e rotas administrativas protegidas por Cloudflare Access.
 - Cloudflare Stream entrega gravações privadas por token. O acesso padrão termina 30 dias após a publicação.
 - O site Next.js oferece currículo, inscrição, área do aluno e painel da equipe.
+- A área do aluno chama `/api/catechesis-platform` no mesmo domínio do site; uma rewrite do Next encaminha ao Worker e mantém o cookie HttpOnly como first party.
 
 ## Segredos obrigatórios
 
