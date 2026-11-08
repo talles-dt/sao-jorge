@@ -26,15 +26,17 @@ export async function handleCatechesisAdminRoutes(path: string, request: Request
 
   if (path === "/api/admin/catechesis-platform/cohorts" && request.method === "POST") {
     const body = await request.json() as Record<string, unknown>;
-    if (!boundedText(body.module_version_id, 100) || !boundedText(body.title, 240) || !isIsoDate(body.starts_on) || !isIsoDate(body.ends_on) || !isOneOf(body.status, ["draft", "open", "in_progress", "closed", "archived"] as const)) return jsonResponse({ error: "Dados da turma inválidos." }, 400, request);
+    const firstStartsAt = typeof body.first_starts_at === "string" ? new Date(body.first_starts_at) : new Date(Number.NaN);
+    const durationMinutes = Number(body.duration_minutes);
+    if (!boundedText(body.module_version_id, 100) || !boundedText(body.title, 240) || !isIsoDate(body.starts_on) || !isIsoDate(body.ends_on) || Number.isNaN(firstStartsAt.getTime()) || !Number.isInteger(durationMinutes) || durationMinutes < 30 || durationMinutes > 240 || !isOneOf(body.status, ["draft", "open", "in_progress", "closed", "archived"] as const)) return jsonResponse({ error: "Dados da turma inválidos." }, 400, request);
     const id = crypto.randomUUID();
     await env.DB.prepare(`INSERT INTO catechesis_cohorts (id, module_version_id, title, starts_on, ends_on, status) VALUES (?, ?, ?, ?, ?, ?)`)
       .bind(id, body.module_version_id, body.title, body.starts_on, body.ends_on, body.status).run();
     const topics = await env.DB.prepare(`SELECT id, meeting_number FROM catechesis_topics WHERE module_version_id = ? ORDER BY meeting_number`).bind(body.module_version_id).all<{ id: string; meeting_number: number }>();
-    const first = new Date(`${String(body.starts_on)}T19:30:00-03:00`);
+    const first = firstStartsAt;
     await env.DB.batch(topics.results.map((topic) => {
       const startsAt = new Date(first.getTime() + (topic.meeting_number - 1) * 14 * 86400000);
-      const endsAt = new Date(startsAt.getTime() + 90 * 60000);
+      const endsAt = new Date(startsAt.getTime() + durationMinutes * 60000);
       return env.DB.prepare(`INSERT INTO catechesis_meetings (id, cohort_id, topic_id, meeting_number, starts_at, ends_at) VALUES (?, ?, ?, ?, ?, ?)`)
         .bind(crypto.randomUUID(), id, topic.id, topic.meeting_number, startsAt.toISOString(), endsAt.toISOString());
     }));
@@ -65,7 +67,9 @@ export async function handleCatechesisAdminRoutes(path: string, request: Request
     const body = await request.json() as Record<string, unknown>;
     const liveUrl = body.live_url === "" || body.live_url == null ? null : body.live_url;
     const recordingUid = body.recording_uid === "" || body.recording_uid == null ? null : body.recording_uid;
-    if ((liveUrl !== null && (!boundedText(liveUrl, 1000) || !String(liveUrl).startsWith("https://"))) || (recordingUid !== null && !boundedText(recordingUid, 100))) return jsonResponse({ error: "Dados da aula inválidos." }, 400, request);
+    const startsAt = typeof body.starts_at === "string" ? new Date(body.starts_at) : null;
+    const endsAt = typeof body.ends_at === "string" ? new Date(body.ends_at) : null;
+    if ((liveUrl !== null && (!boundedText(liveUrl, 1000) || !String(liveUrl).startsWith("https://"))) || (recordingUid !== null && !boundedText(recordingUid, 100)) || (startsAt && Number.isNaN(startsAt.getTime())) || (endsAt && Number.isNaN(endsAt.getTime())) || (startsAt && endsAt && endsAt.getTime() <= startsAt.getTime())) return jsonResponse({ error: "Dados da aula inválidos." }, 400, request);
     const publishedAt = recordingUid ? new Date().toISOString() : null;
     const expiresAt = recordingUid ? new Date(Date.now() + 30 * 86400000).toISOString() : null;
     if (recordingUid) {
@@ -77,8 +81,8 @@ export async function handleCatechesisAdminRoutes(path: string, request: Request
         return jsonResponse({ error: "A gravação não foi encontrada ou não pôde ser protegida no Cloudflare Stream." }, 502, request);
       }
     }
-    await env.DB.prepare(`UPDATE catechesis_meetings SET live_url = ?, recording_uid = ?, recording_published_at = ?, recording_expires_at = ?, updated_at = ? WHERE id = ?`)
-      .bind(liveUrl, recordingUid, publishedAt, expiresAt, new Date().toISOString(), meeting[1]).run();
+    await env.DB.prepare(`UPDATE catechesis_meetings SET live_url = ?, recording_uid = ?, recording_published_at = ?, recording_expires_at = ?, starts_at = COALESCE(?, starts_at), ends_at = COALESCE(?, ends_at), updated_at = ? WHERE id = ?`)
+      .bind(liveUrl, recordingUid, publishedAt, expiresAt, startsAt?.toISOString() ?? null, endsAt?.toISOString() ?? null, new Date().toISOString(), meeting[1]).run();
     await audit(env, auth, "update", "catechesis_meeting", meeting[1], { has_live_url: Boolean(liveUrl), has_recording: Boolean(recordingUid) });
     return jsonResponse({ ok: true, recording_expires_at: expiresAt }, 200, request);
   }

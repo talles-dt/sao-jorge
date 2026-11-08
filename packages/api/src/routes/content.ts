@@ -103,6 +103,12 @@ export async function handleContentRoutes(
   // Single catechesis unit with lessons
   if (path.startsWith("/api/catechesis/") && request.method === "GET") {
     const slug = path.split("/api/catechesis/")[1]?.replace("/", "") ?? "";
+    if (slug === "catequese-adultos") {
+      return jsonResponse({
+        error: "O currículo de 31 encontros foi substituído pela Catequese São Jorge V3.",
+        replacement: "/api/catechesis-platform/modules",
+      }, 410, request);
+    }
     const unit = await env.DB.prepare(
       `SELECT * FROM catechesis_units WHERE slug = ?`,
     )
@@ -135,6 +141,12 @@ export async function handleContentRoutes(
     }
 
     const unitSlug = typeof body.unit_slug === "string" ? body.unit_slug.trim() : "";
+    if (unitSlug === "catequese-adultos") {
+      return jsonResponse({
+        error: "Esta inscrição foi substituída pelo formulário da Catequese São Jorge V3.",
+        replacement: "/api/catechesis-platform/applications",
+      }, 410, request);
+    }
     const fullName = typeof body.full_name === "string" ? body.full_name.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const agreedToTerms = body.agreed_to_terms === true;
