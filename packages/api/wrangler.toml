@@ -14,6 +14,7 @@ ADMIN_UI_URL = "https://sao-jorge-api.talles-f1e.workers.dev/admin"
 ADMIN_UI_ORIGIN = "https://sao-jorge-iota.vercel.app"
 CATECHESIS_WEB_ORIGIN = "https://sao-jorge.oliceu.com"
 CATECHESIS_FROM_EMAIL = "Catequese São Jorge <catequese@sao-jorge.oliceu.com>"
+CLOUDFLARE_STREAM_CUSTOMER_CODE = "SET_IN_ENVIRONMENT"
 
 # ── D1 Database ────────────────────────────────────────────────────────────────
 [[d1_databases]]
@@ -40,12 +41,13 @@ crons = ["0 3 * * *"]
 [ai]
 binding = "AI"
 
+[stream]
+binding = "STREAM"
+
 # ── Secrets (set via: wrangler secret put SECRET_NAME) ───────────────────────
 # Access JWT validation uses ACCESS_TEAM_DOMAIN and ACCESS_AUDIENCE above.
 # RESEND_KEY  — Resend API key for email notifications (optional)
 # ADMIN_EMAIL — Timon's email for review notifications
-# CLOUDFLARE_ACCOUNT_ID — account that owns the private Stream videos
-# CLOUDFLARE_STREAM_TOKEN — least-privilege token for Stream signed tokens
 # CLOUDFLARE_STREAM_CUSTOMER_CODE — customer code used by the Stream player
 
 # ── Staging environment ───────────────────────────────────────────────────────
@@ -65,6 +67,7 @@ ADMIN_UI_URL = "https://sao-jorge-api-staging.talles-f1e.workers.dev/admin"
 ADMIN_UI_ORIGIN = "https://sao-jorge-iota.vercel.app"
 CATECHESIS_WEB_ORIGIN = "https://sao-jorge-iota.vercel.app"
 CATECHESIS_FROM_EMAIL = "Catequese São Jorge <catequese@sao-jorge.oliceu.com>"
+CLOUDFLARE_STREAM_CUSTOMER_CODE = "SET_IN_STAGING"
 
 [[env.staging.d1_databases]]
 binding = "DB"
@@ -86,6 +89,9 @@ crons = []
 [env.staging.ai]
 binding = "AI"
 
+[env.staging.stream]
+binding = "STREAM"
+
 # ── Local development environment ─────────────────────────────────────────────
 [env.dev]
 name = "sao-jorge-api-dev"
@@ -97,6 +103,10 @@ ACCESS_AUDIENCE = "SET_IN_ENVIRONMENT"
 ACCESS_ADMIN_ROLE = "parish-admin"
 CATECHESIS_WEB_ORIGIN = "http://localhost:3000"
 CATECHESIS_FROM_EMAIL = "Catequese São Jorge <dev@example.com>"
+CLOUDFLARE_STREAM_CUSTOMER_CODE = "SET_IN_DEV"
+
+[env.dev.stream]
+binding = "STREAM"
 
 # [[env.dev.d1_databases]]
 # binding = "DB"

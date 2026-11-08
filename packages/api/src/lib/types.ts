@@ -7,6 +7,7 @@ export interface Env {
   DAY_CACHE: KVNamespace;
   MEDIA: R2Bucket;
   AI: Ai;
+  STREAM: StreamBinding;
   ACCESS_TEAM_DOMAIN: string;
   ACCESS_AUDIENCE: string;
   ACCESS_ADMIN_ROLE?: string;
@@ -16,8 +17,6 @@ export interface Env {
   RESEND_KEY?: string;
   CATECHESIS_FROM_EMAIL?: string;
   CATECHESIS_WEB_ORIGIN?: string;
-  CLOUDFLARE_ACCOUNT_ID?: string;
-  CLOUDFLARE_STREAM_TOKEN?: string;
   CLOUDFLARE_STREAM_CUSTOMER_CODE?: string;
   ENVIRONMENT: string;
 }

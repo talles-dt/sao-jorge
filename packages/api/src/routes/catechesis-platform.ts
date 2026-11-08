@@ -109,11 +109,14 @@ export async function handleCatechesisPlatformRoutes(path: string, url: URL, req
     if (!email) return jsonResponse({ error: "Não autenticado." }, 401, request);
     const row = await env.DB.prepare(`SELECT mt.recording_uid, COALESCE(x.new_expires_at, mt.recording_expires_at) AS expires_at FROM catechesis_meetings mt JOIN catechesis_enrollments e ON e.cohort_id = mt.cohort_id LEFT JOIN catechesis_access_extensions x ON x.enrollment_id = e.id AND x.meeting_id = mt.id WHERE mt.id = ? AND e.email = ? AND e.status = 'active' AND mt.recording_uid IS NOT NULL ORDER BY x.created_at DESC LIMIT 1`).bind(recordingMatch[1], email).first<{ recording_uid: string; expires_at: string }>();
     if (!row || !row.expires_at || row.expires_at <= new Date().toISOString()) return jsonResponse({ error: "A gravação não está disponível." }, 403, request);
-    if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_STREAM_TOKEN || !env.CLOUDFLARE_STREAM_CUSTOMER_CODE) return jsonResponse({ error: "Vídeo não configurado." }, 503, request);
-    const stream = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/stream/${row.recording_uid}/token`, { method: "POST", headers: { Authorization: `Bearer ${env.CLOUDFLARE_STREAM_TOKEN}` } });
-    const payload = await stream.json() as { success?: boolean; result?: { token?: string } };
-    if (!stream.ok || !payload.success || !payload.result?.token) return jsonResponse({ error: "Não foi possível liberar o vídeo." }, 502, request);
-    return jsonResponse({ iframe_url: `https://customer-${env.CLOUDFLARE_STREAM_CUSTOMER_CODE}.cloudflarestream.com/${payload.result.token}/iframe` }, 200, request);
+    if (!env.CLOUDFLARE_STREAM_CUSTOMER_CODE) return jsonResponse({ error: "Vídeo não configurado." }, 503, request);
+    try {
+      const token = await env.STREAM.video(row.recording_uid).generateToken();
+      return jsonResponse({ iframe_url: `https://customer-${env.CLOUDFLARE_STREAM_CUSTOMER_CODE}.cloudflarestream.com/${token}/iframe` }, 200, request);
+    } catch (error) {
+      console.error("[catechesis-recording] token generation failed", { meeting_id: recordingMatch[1], error: error instanceof Error ? error.message : "unknown" });
+      return jsonResponse({ error: "Não foi possível liberar o vídeo." }, 502, request);
+    }
   }
 
   return null;

@@ -18,11 +18,9 @@ O sistema não inclui provas, certificados, cobrança, gamificação, mentoria o
 Configurar separadamente em staging e produção:
 
 - `RESEND_KEY`
-- `CLOUDFLARE_ACCOUNT_ID`
-- `CLOUDFLARE_STREAM_TOKEN`
-- `CLOUDFLARE_STREAM_CUSTOMER_CODE`
+- `CLOUDFLARE_STREAM_CUSTOMER_CODE` como variável do ambiente
 
-O remetente `CATECHESIS_FROM_EMAIL` deve usar domínio verificado no provedor de e-mail. Vídeos devem ser marcados com `requireSignedURLs` e restringidos às origens do site.
+O remetente `CATECHESIS_FROM_EMAIL` deve usar domínio verificado no provedor de e-mail. O binding `STREAM` força `requireSignedURLs` e restringe cada gravação à origem do site quando a equipe associa o UID à aula.
 
 ## Ordem segura de publicação
 

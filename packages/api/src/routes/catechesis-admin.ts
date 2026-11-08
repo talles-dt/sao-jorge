@@ -68,6 +68,15 @@ export async function handleCatechesisAdminRoutes(path: string, request: Request
     if ((liveUrl !== null && (!boundedText(liveUrl, 1000) || !String(liveUrl).startsWith("https://"))) || (recordingUid !== null && !boundedText(recordingUid, 100))) return jsonResponse({ error: "Dados da aula inválidos." }, 400, request);
     const publishedAt = recordingUid ? new Date().toISOString() : null;
     const expiresAt = recordingUid ? new Date(Date.now() + 30 * 86400000).toISOString() : null;
+    if (recordingUid) {
+      try {
+        const allowedOrigin = new URL(env.CATECHESIS_WEB_ORIGIN ?? "https://sao-jorge.oliceu.com").host;
+        await env.STREAM.video(String(recordingUid)).update({ requireSignedURLs: true, allowedOrigins: [allowedOrigin] });
+      } catch (error) {
+        console.error("[catechesis-admin] stream protection failed", { meeting_id: meeting[1], error: error instanceof Error ? error.message : "unknown" });
+        return jsonResponse({ error: "A gravação não foi encontrada ou não pôde ser protegida no Cloudflare Stream." }, 502, request);
+      }
+    }
     await env.DB.prepare(`UPDATE catechesis_meetings SET live_url = ?, recording_uid = ?, recording_published_at = ?, recording_expires_at = ?, updated_at = ? WHERE id = ?`)
       .bind(liveUrl, recordingUid, publishedAt, expiresAt, new Date().toISOString(), meeting[1]).run();
     await audit(env, auth, "update", "catechesis_meeting", meeting[1], { has_live_url: Boolean(liveUrl), has_recording: Boolean(recordingUid) });
