@@ -8,6 +8,8 @@ import { runScraper } from "./lib/scraper";
 import { handleLiturgicalRoutes } from "./routes/liturgical";
 import { handleContentRoutes } from "./routes/content";
 import { handleAdminRoutes } from "./routes/admin";
+import { handleCatechesisPlatformRoutes } from "./routes/catechesis-platform";
+import { handleCatechesisAdminRoutes } from "./routes/catechesis-admin";
 
 function isAdminUiPath(path: string): boolean {
   return path === "/admin" || path.startsWith("/admin/") || path.startsWith("/_next/");
@@ -105,7 +107,14 @@ export default {
     const contentResult = await handleContentRoutes(path, url, request, env);
     if (contentResult) return withRequestCors(contentResult);
 
-    // 3. Admin routes
+    const catechesisPlatformResult = await handleCatechesisPlatformRoutes(path, url, request, env);
+    if (catechesisPlatformResult) return withRequestCors(catechesisPlatformResult);
+
+    // 3. Catechesis operations (same Cloudflare Access policy as admin)
+    const catechesisAdminResult = await handleCatechesisAdminRoutes(path, request, env);
+    if (catechesisAdminResult) return withRequestCors(catechesisAdminResult);
+
+    // 4. Admin routes
     const adminResult = await handleAdminRoutes(path, request, env);
     if (adminResult) return withRequestCors(adminResult);
 

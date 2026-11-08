@@ -12,6 +12,8 @@ ACCESS_ADMIN_ROLE = "parish-admin"
 ACCESS_ADMIN_EMAILS = "talles@oliceu.com"
 ADMIN_UI_URL = "https://sao-jorge-api.talles-f1e.workers.dev/admin"
 ADMIN_UI_ORIGIN = "https://sao-jorge-iota.vercel.app"
+CATECHESIS_WEB_ORIGIN = "https://sao-jorge.oliceu.com"
+CATECHESIS_FROM_EMAIL = "Catequese São Jorge <catequese@sao-jorge.oliceu.com>"
 
 # ── D1 Database ────────────────────────────────────────────────────────────────
 [[d1_databases]]
@@ -42,6 +44,9 @@ binding = "AI"
 # Access JWT validation uses ACCESS_TEAM_DOMAIN and ACCESS_AUDIENCE above.
 # RESEND_KEY  — Resend API key for email notifications (optional)
 # ADMIN_EMAIL — Timon's email for review notifications
+# CLOUDFLARE_ACCOUNT_ID — account that owns the private Stream videos
+# CLOUDFLARE_STREAM_TOKEN — least-privilege token for Stream signed tokens
+# CLOUDFLARE_STREAM_CUSTOMER_CODE — customer code used by the Stream player
 
 # ── Staging environment ───────────────────────────────────────────────────────
 # Keep staging resources separate from production. Replace the placeholders
@@ -58,6 +63,8 @@ ACCESS_ADMIN_ROLE = "parish-admin"
 ACCESS_ADMIN_EMAILS = "talles@oliceu.com"
 ADMIN_UI_URL = "https://sao-jorge-api-staging.talles-f1e.workers.dev/admin"
 ADMIN_UI_ORIGIN = "https://sao-jorge-iota.vercel.app"
+CATECHESIS_WEB_ORIGIN = "https://sao-jorge-iota.vercel.app"
+CATECHESIS_FROM_EMAIL = "Catequese São Jorge <catequese@sao-jorge.oliceu.com>"
 
 [[env.staging.d1_databases]]
 binding = "DB"
@@ -88,6 +95,8 @@ ENVIRONMENT = "development"
 ACCESS_TEAM_DOMAIN = "YOUR-TEAM.cloudflareaccess.com"
 ACCESS_AUDIENCE = "SET_IN_ENVIRONMENT"
 ACCESS_ADMIN_ROLE = "parish-admin"
+CATECHESIS_WEB_ORIGIN = "http://localhost:3000"
+CATECHESIS_FROM_EMAIL = "Catequese São Jorge <dev@example.com>"
 
 # [[env.dev.d1_databases]]
 # binding = "DB"

@@ -10,7 +10,7 @@
     "deploy:staged": "wrangler deploy --env staging",
     "test": "vitest run",
     "db:local": "wrangler d1 execute sao-jorge-db --local --file=./migrations/001_schema.sql && wrangler d1 execute sao-jorge-db --local --file=./migrations/002_seed.sql",
-    "db:migrate": "wrangler d1 execute sao-jorge-db --file=./migrations/001_schema.sql && wrangler d1 execute sao-jorge-db --file=./migrations/002_seed.sql && wrangler d1 execute sao-jorge-db --file=./migrations/003_add_category.sql && wrangler d1 execute sao-jorge-db --file=./migrations/004_catequese_adultos_restructure.sql && wrangler d1 execute sao-jorge-db --file=./migrations/005_catechesis_privacy.sql && wrangler d1 execute sao-jorge-db --file=./migrations/006_signup_rate_limits.sql && wrangler d1 execute sao-jorge-db --file=./migrations/007_admin_audit_events.sql",
+    "db:migrate": "wrangler d1 execute sao-jorge-db --file=./migrations/001_schema.sql && wrangler d1 execute sao-jorge-db --file=./migrations/002_seed.sql && wrangler d1 execute sao-jorge-db --file=./migrations/003_add_category.sql && wrangler d1 execute sao-jorge-db --file=./migrations/004_catequese_adultos_restructure.sql && wrangler d1 execute sao-jorge-db --file=./migrations/005_catechesis_privacy.sql && wrangler d1 execute sao-jorge-db --file=./migrations/006_signup_rate_limits.sql && wrangler d1 execute sao-jorge-db --file=./migrations/007_admin_audit_events.sql && wrangler d1 execute sao-jorge-db --file=./migrations/008_catechesis_platform.sql",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

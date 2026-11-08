@@ -13,6 +13,12 @@ export interface Env {
   ACCESS_ADMIN_EMAILS?: string;
   ADMIN_UI_URL?: string;
   ADMIN_UI_ORIGIN?: string;
+  RESEND_KEY?: string;
+  CATECHESIS_FROM_EMAIL?: string;
+  CATECHESIS_WEB_ORIGIN?: string;
+  CLOUDFLARE_ACCOUNT_ID?: string;
+  CLOUDFLARE_STREAM_TOKEN?: string;
+  CLOUDFLARE_STREAM_CUSTOMER_CODE?: string;
   ENVIRONMENT: string;
 }
 

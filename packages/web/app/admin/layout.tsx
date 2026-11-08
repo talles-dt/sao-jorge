@@ -87,6 +87,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             Serviços
           </Link>
+          <Link href="/admin/catequese" className="block px-3 py-2 rounded-lg hover:bg-stone-800 text-sm transition">Catequese V3</Link>
         </nav>
       </aside>
       <main className="flex-1 overflow-auto p-8">{children}</main>
