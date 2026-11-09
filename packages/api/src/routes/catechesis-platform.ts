@@ -90,7 +90,25 @@ export async function handleCatechesisPlatformRoutes(path: string, url: URL, req
     const email = await sessionEmail(request, env);
     if (!email) return jsonResponse({ error: "Não autenticado." }, 401, request);
     const enrollments = await env.DB.prepare(`SELECT e.id, e.cohort_id, e.status, c.title AS cohort_title, c.starts_on, c.ends_on, m.title AS module_title FROM catechesis_enrollments e JOIN catechesis_cohorts c ON c.id = e.cohort_id JOIN catechesis_module_versions v ON v.id = c.module_version_id JOIN catechesis_modules m ON m.id = v.module_id WHERE e.email = ? AND e.status = 'active'`).bind(email).all();
-    const meetings = await env.DB.prepare(`SELECT mt.id, mt.cohort_id, mt.meeting_number, mt.starts_at, mt.ends_at, mt.recording_published_at, mt.recording_expires_at, t.title, CASE WHEN mt.live_url IS NOT NULL AND datetime('now') >= datetime(mt.starts_at, '-30 minutes') AND datetime('now') <= datetime(mt.ends_at) THEN 1 ELSE 0 END AS live_available FROM catechesis_meetings mt JOIN catechesis_topics t ON t.id = mt.topic_id JOIN catechesis_enrollments e ON e.cohort_id = mt.cohort_id WHERE e.email = ? AND e.status = 'active' ORDER BY mt.starts_at`).bind(email).all();
+    const meetings = await env.DB.prepare(`
+      SELECT mt.id, mt.cohort_id, mt.meeting_number, mt.starts_at, mt.ends_at,
+        mt.recording_published_at,
+        COALESCE(
+          (SELECT MAX(x.new_expires_at) FROM catechesis_access_extensions x WHERE x.enrollment_id = e.id AND x.meeting_id = mt.id),
+          mt.recording_expires_at
+        ) AS recording_expires_at,
+        t.title,
+        CASE WHEN mt.live_url IS NOT NULL AND datetime('now') >= datetime(mt.starts_at, '-30 minutes') AND datetime('now') <= datetime(mt.ends_at) THEN 1 ELSE 0 END AS live_available,
+        CASE WHEN mt.recording_uid IS NOT NULL AND datetime(COALESCE(
+          (SELECT MAX(x.new_expires_at) FROM catechesis_access_extensions x WHERE x.enrollment_id = e.id AND x.meeting_id = mt.id),
+          mt.recording_expires_at
+        )) > datetime('now') THEN 1 ELSE 0 END AS recording_available
+      FROM catechesis_meetings mt
+      JOIN catechesis_topics t ON t.id = mt.topic_id
+      JOIN catechesis_enrollments e ON e.cohort_id = mt.cohort_id
+      WHERE e.email = ? AND e.status = 'active'
+      ORDER BY mt.starts_at
+    `).bind(email).all();
     return jsonResponse({ email, enrollments: enrollments.results, meetings: meetings.results }, 200, request);
   }
 
