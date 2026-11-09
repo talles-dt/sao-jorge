@@ -15,9 +15,12 @@ Os hashes identificam exatamente os arquivos aprovados. Qualquer alteração pos
 
 ## Telas
 
-Status: **aguardando aprovação**.
+Status: **aprovadas pelo responsável do projeto em 9 de novembro de 2026**.
 
-- Currículo e inscrição.
-- Área do aluno.
-- Administração da catequese.
+Versão visual aprovada: commit `5a2705a705f896db9e103954043d029ea7c1d57d`.
 
+- Currículo e inscrição: `/catequeses/catequese-adultos`.
+- Área do aluno: `/catequeses/area`.
+- Administração da catequese: `/admin/catequese`.
+
+Alterações posteriores nessas superfícies exigem nova revisão visual.
