@@ -12,6 +12,9 @@ ACCESS_ADMIN_ROLE = "parish-admin"
 ACCESS_ADMIN_EMAILS = "talles@oliceu.com"
 ADMIN_UI_URL = "https://sao-jorge-api.talles-f1e.workers.dev/admin"
 ADMIN_UI_ORIGIN = "https://sao-jorge-iota.vercel.app"
+CATECHESIS_WEB_ORIGIN = "https://sao-jorge.oliceu.com"
+# Set CATECHESIS_FROM_EMAIL and CLOUDFLARE_STREAM_CUSTOMER_CODE as Worker
+# secrets in each deployed environment.
 
 # ── D1 Database ────────────────────────────────────────────────────────────────
 [[d1_databases]]
@@ -38,10 +41,14 @@ crons = ["0 3 * * *"]
 [ai]
 binding = "AI"
 
+[stream]
+binding = "STREAM"
+
 # ── Secrets (set via: wrangler secret put SECRET_NAME) ───────────────────────
 # Access JWT validation uses ACCESS_TEAM_DOMAIN and ACCESS_AUDIENCE above.
 # RESEND_KEY  — Resend API key for email notifications (optional)
 # ADMIN_EMAIL — Timon's email for review notifications
+# CLOUDFLARE_STREAM_CUSTOMER_CODE — customer code used by the Stream player
 
 # ── Staging environment ───────────────────────────────────────────────────────
 # Keep staging resources separate from production. Replace the placeholders
@@ -58,6 +65,9 @@ ACCESS_ADMIN_ROLE = "parish-admin"
 ACCESS_ADMIN_EMAILS = "talles@oliceu.com"
 ADMIN_UI_URL = "https://sao-jorge-api-staging.talles-f1e.workers.dev/admin"
 ADMIN_UI_ORIGIN = "https://sao-jorge-iota.vercel.app"
+CATECHESIS_WEB_ORIGIN = "https://sao-jorge-git-feat-cateches-bcee93-tallestonatto-5836s-projects.vercel.app"
+# Set CATECHESIS_FROM_EMAIL and CLOUDFLARE_STREAM_CUSTOMER_CODE as staging
+# secrets so deploys cannot replace verified provider configuration.
 
 [[env.staging.d1_databases]]
 binding = "DB"
@@ -79,6 +89,9 @@ crons = []
 [env.staging.ai]
 binding = "AI"
 
+[env.staging.stream]
+binding = "STREAM"
+
 # ── Local development environment ─────────────────────────────────────────────
 [env.dev]
 name = "sao-jorge-api-dev"
@@ -88,6 +101,12 @@ ENVIRONMENT = "development"
 ACCESS_TEAM_DOMAIN = "YOUR-TEAM.cloudflareaccess.com"
 ACCESS_AUDIENCE = "SET_IN_ENVIRONMENT"
 ACCESS_ADMIN_ROLE = "parish-admin"
+CATECHESIS_WEB_ORIGIN = "http://localhost:3000"
+CATECHESIS_FROM_EMAIL = "Catequese São Jorge <dev@example.com>"
+CLOUDFLARE_STREAM_CUSTOMER_CODE = "SET_IN_DEV"
+
+[env.dev.stream]
+binding = "STREAM"
 
 # [[env.dev.d1_databases]]
 # binding = "DB"

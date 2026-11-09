@@ -7,6 +7,7 @@ export default function AdminDashboard() {
     { href: "/admin/boletim", label: "Boletim", desc: "Avisos e comunicados paroquiais" },
     { href: "/admin/servicos", label: "Serviços", desc: "Textos litúrgicos e serviços" },
     { href: "/admin/zernio", label: "Zernio Social", desc: "Gerenciar posts, analytics e inbox" },
+    { href: "/admin/catequese", label: "Catequese V3", desc: "Turmas, inscrições, aulas e gravações" },
   ];
 
   return (

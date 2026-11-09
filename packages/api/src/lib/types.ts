@@ -7,12 +7,17 @@ export interface Env {
   DAY_CACHE: KVNamespace;
   MEDIA: R2Bucket;
   AI: Ai;
+  STREAM: StreamBinding;
   ACCESS_TEAM_DOMAIN: string;
   ACCESS_AUDIENCE: string;
   ACCESS_ADMIN_ROLE?: string;
   ACCESS_ADMIN_EMAILS?: string;
   ADMIN_UI_URL?: string;
   ADMIN_UI_ORIGIN?: string;
+  RESEND_KEY?: string;
+  CATECHESIS_FROM_EMAIL?: string;
+  CATECHESIS_WEB_ORIGIN?: string;
+  CLOUDFLARE_STREAM_CUSTOMER_CODE?: string;
   ENVIRONMENT: string;
 }
 
@@ -48,10 +53,15 @@ const ALLOWED_ORIGINS = new Set([
   "http://localhost:3000",
 ]);
 
-export function corsHeaders(request?: Request): Record<string, string> {
+export function corsHeaders(request?: Request, configuredOrigin?: string): Record<string, string> {
   const origin = request?.headers.get("Origin") ?? "";
+  const allowedOrigins = configuredOrigin
+    ? new Set([...ALLOWED_ORIGINS, configuredOrigin])
+    : ALLOWED_ORIGINS;
   return {
-    "Access-Control-Allow-Origin": ALLOWED_ORIGINS.has(origin) ? origin : "https://sao-jorge.oliceu.com",
+    "Access-Control-Allow-Origin": allowedOrigins.has(origin)
+      ? origin
+      : (configuredOrigin ?? "https://sao-jorge.oliceu.com"),
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, Cf-Access-Jwt-Assertion",
     "Access-Control-Allow-Credentials": "true",
