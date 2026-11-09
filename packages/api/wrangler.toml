@@ -66,8 +66,8 @@ ACCESS_ADMIN_EMAILS = "talles@oliceu.com"
 ADMIN_UI_URL = "https://sao-jorge-api-staging.talles-f1e.workers.dev/admin"
 ADMIN_UI_ORIGIN = "https://sao-jorge-iota.vercel.app"
 CATECHESIS_WEB_ORIGIN = "https://sao-jorge-git-feat-cateches-bcee93-tallestonatto-5836s-projects.vercel.app"
-CATECHESIS_FROM_EMAIL = "Catequese São Jorge <catequese@sao-jorge.oliceu.com>"
-CLOUDFLARE_STREAM_CUSTOMER_CODE = "SET_IN_STAGING"
+# Set CATECHESIS_FROM_EMAIL and CLOUDFLARE_STREAM_CUSTOMER_CODE as staging
+# secrets so deploys cannot replace verified provider configuration.
 
 [[env.staging.d1_databases]]
 binding = "DB"
