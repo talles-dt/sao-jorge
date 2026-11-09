@@ -12,7 +12,7 @@ ACCESS_ADMIN_ROLE = "parish-admin"
 ACCESS_ADMIN_EMAILS = "talles@oliceu.com"
 ADMIN_UI_URL = "https://sao-jorge-api.talles-f1e.workers.dev/admin"
 ADMIN_UI_ORIGIN = "https://sao-jorge-iota.vercel.app"
-CATECHESIS_WEB_ORIGIN = "https://sao-jorge.oliceu.com"
+CATECHESIS_WEB_ORIGIN = "https://sao-jorge-iota.vercel.app"
 # Set CATECHESIS_FROM_EMAIL and CLOUDFLARE_STREAM_CUSTOMER_CODE as Worker
 # secrets in each deployed environment.
 
