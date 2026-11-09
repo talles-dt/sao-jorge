@@ -57,7 +57,7 @@ export default {
 
     // CORS preflight
     if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: corsHeaders(request) });
+      return new Response(null, { status: 204, headers: corsHeaders(request, env.CATECHESIS_WEB_ORIGIN) });
     }
 
     // Health check
@@ -97,7 +97,7 @@ export default {
     const withRequestCors = (response: Response) => {
       const headers = new Headers(response.headers);
       for (const name of ["access-control-allow-origin", "access-control-allow-methods", "access-control-allow-headers", "access-control-allow-credentials", "content-type"]) headers.delete(name);
-      for (const [name, value] of Object.entries(corsHeaders(request))) headers.set(name, value);
+      for (const [name, value] of Object.entries(corsHeaders(request, env.CATECHESIS_WEB_ORIGIN))) headers.set(name, value);
       return new Response(response.body, { status: response.status, headers });
     };
     const liturgicalResult = await handleLiturgicalRoutes(path, request, env);
