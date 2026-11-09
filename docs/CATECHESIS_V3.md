@@ -1,5 +1,8 @@
 # Catequese São Jorge V3
 
+O estado formal das aprovações editoriais e visuais está registrado em
+[`CATECHESIS_V3_APPROVALS.md`](./CATECHESIS_V3_APPROVALS.md).
+
 ## Escopo
 
 A V3 substitui operacionalmente a grade de 31 encontros por três módulos quadrimestrais independentes: básico, intermediário e avançado. Cada módulo possui oito encontros quinzenais e uma única turma híbrida, presencial e online.
