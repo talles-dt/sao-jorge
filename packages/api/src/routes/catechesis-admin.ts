@@ -1,6 +1,7 @@
 import type { Env } from "../lib/types";
 import { checkAdminAuth, jsonResponse } from "../lib/types";
 import { boundedText, isIsoDate, isOneOf } from "../lib/validation";
+import { recordingPublication } from "../lib/catechesis-recording";
 
 async function audit(env: Env, actor: { sub: string; email?: string }, action: string, resource: string, resourceId?: string, metadata?: unknown) {
   await env.DB.prepare(`INSERT INTO admin_audit_events (actor_subject, actor_email, action, resource_type, resource_id, metadata) VALUES (?, ?, ?, ?, ?, ?)`)
@@ -70,9 +71,15 @@ export async function handleCatechesisAdminRoutes(path: string, request: Request
     const startsAt = typeof body.starts_at === "string" ? new Date(body.starts_at) : null;
     const endsAt = typeof body.ends_at === "string" ? new Date(body.ends_at) : null;
     if ((liveUrl !== null && (!boundedText(liveUrl, 1000) || !String(liveUrl).startsWith("https://"))) || (recordingUid !== null && !boundedText(recordingUid, 100)) || (startsAt && Number.isNaN(startsAt.getTime())) || (endsAt && Number.isNaN(endsAt.getTime())) || (startsAt && endsAt && endsAt.getTime() <= startsAt.getTime())) return jsonResponse({ error: "Dados da aula inválidos." }, 400, request);
-    const publishedAt = recordingUid ? new Date().toISOString() : null;
-    const expiresAt = recordingUid ? new Date(Date.now() + 30 * 86400000).toISOString() : null;
-    if (recordingUid) {
+    const current = await env.DB.prepare(`SELECT recording_uid, recording_published_at, recording_expires_at FROM catechesis_meetings WHERE id = ?`)
+      .bind(meeting[1]).first<{ recording_uid: string | null; recording_published_at: string | null; recording_expires_at: string | null }>();
+    if (!current) return jsonResponse({ error: "Aula não encontrada." }, 404, request);
+    const publication = recordingPublication({
+      uid: current.recording_uid,
+      publishedAt: current.recording_published_at,
+      expiresAt: current.recording_expires_at,
+    }, recordingUid === null ? null : String(recordingUid));
+    if (recordingUid && publication.changed) {
       try {
         const allowedOrigin = new URL(env.CATECHESIS_WEB_ORIGIN ?? "https://sao-jorge.oliceu.com").host;
         await env.STREAM.video(String(recordingUid)).update({ requireSignedURLs: true, allowedOrigins: [allowedOrigin] });
@@ -82,9 +89,9 @@ export async function handleCatechesisAdminRoutes(path: string, request: Request
       }
     }
     await env.DB.prepare(`UPDATE catechesis_meetings SET live_url = ?, recording_uid = ?, recording_published_at = ?, recording_expires_at = ?, starts_at = COALESCE(?, starts_at), ends_at = COALESCE(?, ends_at), updated_at = ? WHERE id = ?`)
-      .bind(liveUrl, recordingUid, publishedAt, expiresAt, startsAt?.toISOString() ?? null, endsAt?.toISOString() ?? null, new Date().toISOString(), meeting[1]).run();
+      .bind(liveUrl, recordingUid, publication.publishedAt, publication.expiresAt, startsAt?.toISOString() ?? null, endsAt?.toISOString() ?? null, new Date().toISOString(), meeting[1]).run();
     await audit(env, auth, "update", "catechesis_meeting", meeting[1], { has_live_url: Boolean(liveUrl), has_recording: Boolean(recordingUid) });
-    return jsonResponse({ ok: true, recording_expires_at: expiresAt }, 200, request);
+    return jsonResponse({ ok: true, recording_expires_at: publication.expiresAt }, 200, request);
   }
 
   return null;
